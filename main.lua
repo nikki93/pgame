@@ -21,8 +21,62 @@ entity.meta = {
       if r then return r end
     end
     return nil
+  end,
+
+  __newindex = function (o, k, v)
+    -- function? create a cont-continuation
+    if type(v) == 'function' then
+      rawget(o, '_methods')[k] = v
+
+      local f = function(self, ...)
+        local ord = entity._proto_order(self)
+        local i = 0
+
+        if self.id == 0 then
+          print('--')
+          for _, e in ipairs(ord) do
+            print(e.id)
+          end
+          print('--')
+        end
+
+        local function cont(...)
+          while true do
+            i = i + 1
+            if i > #ord then return nil end
+            local pf = rawget(ord[i], '_methods')[k]
+            if pf then return pf(self, cont, ...) end
+          end
+        end
+
+        return cont(...)
+      end
+      rawset(o, k, f)
+    else
+      rawset(o, k, v)
+    end
   end
 }
+
+-- order in which protos are visited for methods, an array of objects (not ids)
+function entity._proto_order(e)
+  local ord = {}
+  local vis = {} -- set version of above
+
+  local function visit(e)
+    if not vis[e.id] then
+      vis[e.id] = true
+      table.insert(ord, e)
+    end
+    for _, proto_id in ipairs(rawget(e, 'proto_ids') or {}) do
+      local p = entities[proto_id]
+      if not p then error('no entity with id ' .. proto_id) end
+      visit(p)
+    end
+  end
+  visit(e)
+  return ord
+end
 
 -- create a sub-proto relationship -- sub and proto are both entity ids
 function entity.link(sub, proto)
@@ -43,42 +97,7 @@ function entity.link(sub, proto)
   rawset(s, 'proto_ids', ps)
 end
 
-
--- the base entity
-entities.entity = setmetatable({ proto_ids = {} }, entity.meta)
-
--- convenience message to add a proto
-function entities.entity.add_proto_id(self, proto_id)
-  entity.link(self.id, proto_id)
-end
-
--- return all sub ids, recursively, as a set
-function entities.entity.rsub_ids(self)
-  local result = {}
-  local function collect(e)
-    for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
-      if not result[sub_id] then
-        result[sub_id] = true
-        collect(entities[sub_id] or error('no entity with id ' .. sub_id))
-      end
-    end
-  end
-  collect(self)
-  return result
-end
-
--- entities can be flagged as 'live' or not -- only live ones respond to events
--- this property isn't inherited
-function entities.entity.live(self, set)
-  if set ~= nil then
-    rawset(self, 'alive', set)
-    return set
-  end
-  return rawget(self, 'alive')
-end
-
-
--- internal: create and return new entity with id, given the id
+-- internal: create and return new entity with given id and no protos
 entity.next_id = 0
 function entity._create(id)
   -- id a string? make sure no clash, else find next numeric id
@@ -96,15 +115,50 @@ function entity._create(id)
 
   -- create and return entity
   local e = {
+    _methods = {},
     id = id,
     proto_ids = {}, sub_ids = {},
     alive = false
   }
   setmetatable(e, entity.meta)
   entities[id] = e
-  entity.link(id, 'entity')
   return e
 end
+
+
+-- the base entity
+entity._create('entity')
+
+-- convenience message to add a proto
+function entities.entity.add_proto_id(self, cont, proto_id)
+  entity.link(self.id, proto_id)
+end
+
+-- return all sub ids, recursively, as a set
+function entities.entity.rsub_ids(self, cont)
+  local result = {}
+  local function collect(e)
+    for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
+      if not result[sub_id] then
+        result[sub_id] = true
+        collect(entities[sub_id] or error('no entity with id ' .. sub_id))
+      end
+    end
+  end
+  collect(self)
+  return result
+end
+
+-- entities can be flagged as 'live' or not -- only live ones respond to events
+-- this property isn't inherited
+function entities.entity.live(self, cont, set)
+  if set ~= nil then
+    rawset(self, 'alive', set)
+    return set
+  end
+  return rawget(self, 'alive')
+end
+
 
 -- create an entity with given ids of entities as proto_ids
 function entity.create(proto_ids)
@@ -119,6 +173,9 @@ function entity.create_named(name, proto_ids)
   if proto_ids then
     for _, proto in ipairs(proto_ids) do entity.link(e.id, proto) end
   end
+  if #rawget(e, 'proto_ids') == 0 then
+    entity.link(e.id, 'entity')
+  end
   return e
 end
 
@@ -129,9 +186,9 @@ end
 
 entity.create_named('update')
 
-function entities.update.update(self, dt) end
+function entities.update.update(self, cont, dt) end
 
-function entities.update.update_rsubs(self, dt)
+function entities.update.update_rsubs(self, cont, dt)
   for e in pairs(self:rsub_ids()) do
     local e = entities[e]
     if e:live() then e:update(dt) end
@@ -151,9 +208,9 @@ entities.transform.rotation = 0
 
 entity.create_named('drawable')
 
-function entities.drawable.draw(self) end
+function entities.drawable.draw(self, cont) end
 
-function entities.drawable.draw_rsubs(self)
+function entities.drawable.draw_rsubs(self, cont)
   for e in pairs(self:rsub_ids()) do
     local e = entities[e]
     if e:live() then e:draw() end
@@ -167,7 +224,8 @@ entity.create_named('rotator', { 'update', 'transform' })
 
 entities.rotator.rotation_speed = 30
 
-function entities.rotator.update(self, dt)
+function entities.rotator.update(self, cont, dt)
+  cont(dt)
   self.rotation = self.rotation + self.rotation_speed * dt
 end
 
@@ -176,7 +234,13 @@ end
 
 entity.create_named('player', { 'drawable', 'transform' })
 
-function entities.player.draw(self)
+function entities.player.update(self, cont, dt)
+  cont(dt)
+  self.position = { self.position[1] + 20 * dt, self.position[2] }
+end
+
+function entities.player.draw(self, cont)
+  cont()
   love.graphics.push()
   love.graphics.translate(unpack(self.position))
   love.graphics.rotate(self.rotation)
@@ -192,7 +256,6 @@ require('scratch')
 function love.load()
   love.window.setMode(800, 600, { x = 629, y = 56 })
   scratch.load()
-  print(package.path)
 end
 
 function love.update(dt)
@@ -200,7 +263,7 @@ function love.update(dt)
   entities.update:update_rsubs(dt)
 end
 
-the_player = entity.create({ 'player' })
+the_player = entity.create({ 'player', 'rotator' })
 the_player:live(true)
 
 function love.draw()
