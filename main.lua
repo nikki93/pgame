@@ -24,10 +24,6 @@ entity.meta = {
   end
 }
 
--- the base entity
-entities.entity = setmetatable({ proto_ids = {} }, entity.meta)
-
-
 -- create a sub-proto relationship -- sub and proto are both entity ids
 function entity.link(sub, proto)
   local p = entities[proto]
@@ -46,6 +42,10 @@ function entity.link(sub, proto)
   table.insert(ps, proto)
   rawset(s, 'proto_ids', ps)
 end
+
+
+-- the base entity
+entities.entity = setmetatable({ proto_ids = {} }, entity.meta)
 
 -- convenience message to add a proto
 function entities.entity.add_proto_id(self, proto_id)
@@ -67,6 +67,16 @@ function entities.entity.rsub_ids(self)
   return result
 end
 
+-- entities can be flagged as 'live' or not -- only live ones respond to events
+-- this property isn't inherited
+function entities.entity.live(self, set)
+  if set ~= nil then
+    rawset(self, 'alive', set)
+    return set
+  end
+  return rawget(self, 'alive')
+end
+
 
 -- internal: create and return new entity with id, given the id
 entity.next_id = 0
@@ -85,10 +95,15 @@ function entity._create(id)
   end
 
   -- create and return entity
-  local e = setmetatable({ proto_ids = {}, sub_ids = {}, id = id }, entity.meta)
+  local e = {
+    id = id,
+    proto_ids = {}, sub_ids = {},
+    alive = false
+  }
+  setmetatable(e, entity.meta)
   entities[id] = e
   entity.link(id, 'entity')
-  return id
+  return e
 end
 
 -- create an entity with given ids of entities as proto_ids
@@ -100,11 +115,11 @@ end
 -- if name isn't a string, it is ignored (numeric id is generated)
 function entity.create_named(name, proto_ids)
   if type(name) ~= 'string' then name = nil end
-  local id = entity._create(name)
+  local e = entity._create(name)
   if proto_ids then
-    for _, proto in ipairs(proto_ids) do entity.link(id, proto) end
+    for _, proto in ipairs(proto_ids) do entity.link(e.id, proto) end
   end
-  return id
+  return e
 end
 
 
@@ -119,7 +134,7 @@ function entities.update.update(self, dt) end
 function entities.update.update_rsubs(self, dt)
   for e in pairs(self:rsub_ids()) do
     local e = entities[e]
-    if e.alive then e:update(dt) end
+    if e:live() then e:update(dt) end
   end
 end
 
@@ -141,7 +156,7 @@ function entities.drawable.draw(self) end
 function entities.drawable.draw_rsubs(self)
   for e in pairs(self:rsub_ids()) do
     local e = entities[e]
-    if e.alive then e:draw() end
+    if e:live() then e:draw() end
   end
 end
 
@@ -186,7 +201,7 @@ function love.update(dt)
 end
 
 the_player = entity.create({ 'player' })
-entities[the_player].alive = true
+the_player:live(true)
 
 function love.draw()
   love.graphics.print("Hello World", 20, 300)
