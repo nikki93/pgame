@@ -13,6 +13,8 @@ entity.meta = {
     -- check in o
     r = rawget(o, k)
     if r ~= nil then return r end
+    r = rawget(o, '_method_entrypoints')[k]
+    if r ~= nil then return r end
 
     -- check recursively in each proto
     for _, proto in ipairs(rawget(o, 'proto_ids')) do
@@ -43,7 +45,7 @@ entity.meta = {
 
         return cont(...)
       end
-      rawset(o, k, f)
+      rawget(o, '_method_entrypoints')[k] = f
     else
       rawset(o, k, v)
     end
@@ -107,7 +109,7 @@ function entity._create(id)
 
   -- create and return entity
   local e = {
-    _methods = {},
+    _method_entrypoints = {}, _methods = {},
     id = id,
     proto_ids = {}, sub_ids = {},
     alive = false
