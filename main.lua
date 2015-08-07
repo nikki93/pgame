@@ -32,14 +32,6 @@ entity.meta = {
         local ord = entity._proto_order(self)
         local i = 0
 
-        if self.id == 0 then
-          print('--')
-          for _, e in ipairs(ord) do
-            print(e.id)
-          end
-          print('--')
-        end
-
         local function cont(...)
           while true do
             i = i + 1
