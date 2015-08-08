@@ -30,6 +30,7 @@ entity.meta = {
     if type(v) == 'function' then
       rawget(o, '_methods')[k] = v
 
+      -- the continuation is a closure that iterates through the proto order
       local f = function(self, ...)
         local ord = entity._proto_order(self)
         local i = 0
