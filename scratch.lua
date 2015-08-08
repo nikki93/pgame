@@ -20,6 +20,7 @@ function scratch.update()
         print(tostring(chunk))
       else
         ok, err = xpcall(chunk, debug.traceback)
+        if not ok then print(err) end
       end
     end
   end
