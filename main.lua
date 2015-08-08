@@ -50,6 +50,10 @@ entity.meta = {
     else
       rawset(o, k, v)
     end
+  end,
+
+  __tostring = function (o)
+    return o:to_string()
   end
 }
 
@@ -152,6 +156,11 @@ function entities.entity.live(self, cont, set)
     return set
   end
   return rawget(self, 'alive')
+end
+
+-- called when attempting to print an entity
+function entities.entity.to_string(self, cont)
+  return '<entities[' .. self.id .. ']>'
 end
 
 
