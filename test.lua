@@ -39,7 +39,6 @@ end
 -- scene
 
 function test_scene()
-  the_player = entity.create({ 'player', 'rotator' })
-  the_player:live(true)
+  the_player = entity.create({ 'alive', 'player', 'rotator' })
 end
 
