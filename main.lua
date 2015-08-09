@@ -1,17 +1,14 @@
 -- main events -----------------------------------------------------------------
 
-require('scratch')
-
 function love.load()
   love.window.setMode(800, 600, { x = 629, y = 56 })
-
-  scratch.load()
 
   -- basic entities
   require('entity')
   require('update')
   require('drawable')
   require('alive')
+  require('scratch')
   require('transform')
 
   -- test entities
@@ -21,7 +18,6 @@ function love.load()
 end
 
 function love.update(dt)
-  scratch.update()
   entities.update:update_rsubs(dt)
 end
 
