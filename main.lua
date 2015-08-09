@@ -11,6 +11,7 @@ function love.load()
   require('entity')
   require('update')
   require('drawable')
+  require('alive')
   require('transform')
 
   -- test entities

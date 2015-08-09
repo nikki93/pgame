@@ -34,8 +34,8 @@
 -- namespace for all entity meta stuff
 entity = {}
 
--- this table with store all entities that exist (whether live or not), so that
--- entities[o.id] == o, where o is an entity
+-- this table with store all entities that exist, so that entities[o.id] == o,
+-- where o is an entity
 entities = {}
 
 
@@ -156,8 +156,7 @@ function entity._create(id)
   local e = {
     _method_entrypoints = {}, _methods = {},
     id = id,
-    proto_ids = {}, sub_ids = {},
-    alive = false
+    proto_ids = {}, sub_ids = {}
   }
   setmetatable(e, entity.meta)
   entities[id] = e
@@ -187,16 +186,6 @@ function entities.entity.rsub_ids(self, cont)
   end
   collect(self)
   return result
-end
-
--- entities can be flagged as 'live' or not -- only live ones respond to events
--- this property isn't inherited
-function entities.entity.live(self, cont, set)
-  if set ~= nil then
-    rawset(self, 'alive', set)
-    return set
-  end
-  return rawget(self, 'alive')
 end
 
 -- called on string conversion with tostring(...)
