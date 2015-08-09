@@ -1,3 +1,5 @@
+-- can be visualized
+
 entity.create_named('drawable')
 
 entities.drawable.drawing = false -- whether to receive draw events

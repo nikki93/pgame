@@ -1,3 +1,6 @@
+-- continuously checks the given file for modification and runs lua code in it
+-- when modified -- can be used to 'eval' from text editors
+
 scratch = {}
 
 scratch.path = 'scratch-buf.lua'

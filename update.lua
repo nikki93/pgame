@@ -1,3 +1,5 @@
+-- updated every frame
+
 entity.create_named('update')
 
 entities.update.updating = false -- whether to receive update events
