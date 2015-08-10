@@ -62,8 +62,12 @@ entity.meta = {
   end,
 
   __newindex = function (o, k, v)
-    -- function? create a cont-continuation
-    if type(v) == 'function' then
+    if v == nil then
+      -- remove previous method stuff if exists
+      rawget(o, '_methods')[k] = nil
+      rawget(o, '_method_entrypoints')[k] = nil
+    elseif type(v) == 'function' then
+      -- function? it's gonna be a method, create a cont-continuation
       rawget(o, '_methods')[k] = v
 
       -- the continuation is a closure that iterates through the proto order
