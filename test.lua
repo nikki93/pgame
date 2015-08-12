@@ -12,10 +12,10 @@ end
 
 -- player
 
-entity.create_named('player', { 'drawable', 'transform' })
+entity.create_named('player', { 'drawable', 'update', 'transform' })
 
 entities.player.dir = 1
-entities.player.position[2] = 200
+entities.player.position = { 10, 200 }
 
 function entities.player.update(self, cont, dt)
   cont(dt)
