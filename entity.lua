@@ -49,8 +49,8 @@ entity.meta = {
     -- check in o
     r = rawget(o, k)
     if r ~= nil then return r end
-    r = rawget(o, '_method_entrypoints')[k]
-    if r ~= nil then return r end
+    r = rawget(o, '_methods')[k]
+    if r ~= nil then return r.entrypoint end
 
     -- check recursively in each proto
     for _, proto in ipairs(rawget(o, 'proto_ids')) do
@@ -63,30 +63,26 @@ entity.meta = {
 
   __newindex = function (o, k, v)
     if v == nil then
-      -- remove previous method stuff if exists
+      -- remove previous method structure if exists
       rawget(o, '_methods')[k] = nil
-      rawget(o, '_method_entrypoints')[k] = nil
     elseif type(v) == 'function' then
-      -- function? it's gonna be a method, create a cont-continuation
-      rawget(o, '_methods')[k] = v
-
+      -- function? it's gonna be a method, need a call-next-method continuation
       -- the continuation is a closure that iterates through the proto order
-      local f = function(self, ...)
+      -- the entrypoint is a wrapper that starts off the chain
+      local function entrypoint(self, ...)
         local ord = entity._proto_order(self)
         local i = 0
-
         local function cont(...)
           while true do
             i = i + 1
             if i > #ord then return nil end
-            local pf = rawget(ord[i], '_methods')[k]
-            if pf then return pf(self, cont, ...) end
+            local pm = rawget(ord[i], '_methods')[k]
+            if pm then return pm.func(self, cont, ...) end
           end
         end
-
         return cont(...)
       end
-      rawget(o, '_method_entrypoints')[k] = f
+      rawget(o, '_methods')[k] = { entrypoint = entrypoint, func = v }
     else
       rawset(o, k, v)
     end
@@ -158,7 +154,7 @@ function entity._create(id)
 
   -- create and return entity
   local e = {
-    _method_entrypoints = {}, _methods = {},
+    _methods = {},
     id = id,
     proto_ids = {}, sub_ids = {}
   }
