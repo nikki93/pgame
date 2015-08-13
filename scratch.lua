@@ -16,7 +16,10 @@ function entities.scratch.update(self, cont, dt)
     if not self.last_existed or self.last_modified < modified then
       self.last_existed = true
       self.last_modified = modified
-      success, chunk = pcall(love.filesystem.load, self.file_path)
+      buf = love.filesystem.read(self.file_path)
+      source_path = string.match(buf, "^%-%-%[%[(.-)%-%-%]%]")
+      success, chunk = pcall(loadstring, buf,
+                             source_path and ("@" .. source_path) or "scratch")
       if not success then
         print('loading scratch failed: ')
         print(tostring(chunk))
