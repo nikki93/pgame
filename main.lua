@@ -3,6 +3,9 @@
 function love.load()
   love.window.setMode(800, 600, { x = 629, y = 56 })
 
+  -- utilities
+  require('util')
+
   -- basic entities
   require('entity')
   require('update')
