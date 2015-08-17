@@ -38,6 +38,11 @@ entity = {}
 -- where o is an entity
 entities = {}
 
+-- same as entities[id], but error if not present
+function entity.get(id)
+  return assert(entities[id], 'no entity with id ' .. id)
+end
+
 
 -- sub/proto logic -------------------------------------------------------------
 
@@ -106,8 +111,7 @@ function entity._proto_order(e)
       table.insert(ord, e)
     end
     for _, proto_id in ipairs(rawget(e, 'proto_ids') or {}) do
-      local p = entities[proto_id]
-      if not p then error('no entity with id ' .. proto_id) end
+      local p = entity.get(proto_id)
       visit(p)
     end
   end
@@ -118,10 +122,8 @@ end
 -- introduce a new sub-proto relationship given the entity ids, and optionally
 -- s or p as the entities themselves
 function entity._link(sub, proto, s, p)
-  p = p or entities[proto]
-  if not p then error('no entity with id ' .. proto) end
-  s = s or entities[sub]
-  if not s then error('no entity with id ' .. sub) end
+  p = p or entity.get(proto)
+  s = s or entity.get(sub)
 
   -- add sub to proto's set of sub_ids
   local ss = rawget(p, 'sub_ids') or {}
@@ -180,7 +182,7 @@ function entities.entity.rsub_ids(self, cont)
     for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
       if not result[sub_id] then
         result[sub_id] = true
-        collect(entities[sub_id] or error('no entity with id ' .. sub_id))
+        collect(entity.get(sub_id))
       end
     end
   end
