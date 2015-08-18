@@ -279,16 +279,16 @@ end
 
 -- save/load -------------------------------------------------------------------
 
--- save entities to a buffer -- ents can be a single entity or an array
+-- save entities to a buffer -- ents must be an array of entities
 function entity.save(ents)
-  if type(ents) ~= 'table' then ents = { ents } end
   -- save everything except methods
   local keyallow = setmetatable({ _methods = false },
     { __index = function () return true end })
   return serpent.dump(ents, { keyallow = keyallow })
 end
 
--- load entities from a buffer
+-- load entities from a buffer -- returns the array of entities as passed to
+-- entity.save(...) to save the buffer
 function entity.load(buf)
   local success, ents = serpent.load(buf)
   if not success then
@@ -350,6 +350,8 @@ function entity.load(buf)
     print("warning: couldn't find proto with id "
             .. entity.stringify_id(id) .. ", ignored")
   end
+
+  return ents
 end
 
 -- save bunch of entities to a file, ents specified as in entity.save(...)
@@ -359,12 +361,13 @@ function entity.save_file(filename, ents)
   f:close()
 end
 
--- load entities from a file
+-- load entities from a file -- returns the array of entities as passed to
+-- entity.save_file(...) to save to the file
 function entity.load_file(filename)
   local f = assert(io.open(filename, 'r'))
   local b = f:read('*a')
   f:close()
-  entity.load(b)
+  return entity.load(b)
 end
 
 
