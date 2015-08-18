@@ -57,8 +57,8 @@ entity = {}
 -- ids are either plains strings or special 'unique id' objects that are
 -- generated when no name is provided
 
--- this table stores all entities that exist, so that entities[o.id] == o,
--- where o is an entity
+-- this table stores all entities that exist, so that entities[o.id] == o, where
+-- o is an entity
 entities = {}
 
 -- stringify an id -- string ids get surrounded with quotes
@@ -120,8 +120,8 @@ entity.meta = {
       rawget(o, '_methods')[k] = nil
     elseif type(v) == 'function' then
       -- function? it's gonna be a method, need a call-next-method continuation
-      -- the continuation is a closure that iterates through the proto order
-      -- the entrypoint is a wrapper that starts off the chain
+      -- the continuation is a closure that iterates through the proto order the
+      -- entrypoint is a wrapper that starts off the chain
       local function entrypoint(self, ...)
         local ord = entity._proto_order(self)
         local i = #ord + 1
@@ -147,16 +147,14 @@ entity.meta = {
 }
 
 -- /reverse/ of order in which protos are visited for methods, an array of
--- objects (not ids) -- the order is the reverse of the topological sort order,
--- so that entities appear after all their protos and ties are broken in
--- right-left order of proto_ids list
+-- entities -- the order is the reverse of the topological sort order, so that
+-- entities appear after all their protos and ties are broken in right-left
+-- order of proto_ids list
 function entity._proto_order(e)
-  local ord = {}
-  local vis = {} -- set version of above
-
+  local ord, vis = {}, {}
   local function visit(e)
-    if vis[e.id] then return end
-    vis[e.id] = true
+    if vis[e] then return end
+    vis[e] = true
     local pids = rawget(e, 'proto_ids')
     for i = #pids, 1, -1 do
       local p = entity.get(pids[i])
