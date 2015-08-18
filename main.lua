@@ -7,9 +7,6 @@ function love.load()
   serpent = require('serpent')
   dbg = require('debugger')
 
-  -- utilities
-  require('util')
-
   -- basic entities
   require('entity')
   require('update')
