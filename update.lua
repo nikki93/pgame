@@ -12,8 +12,7 @@ function entities.update.update_rsubs(self, cont, dt)
     self.skip_next_frame = false
     return
   end
-  for e in pairs(self:rsub_ids()) do
-    local e = entities[e]
+  for e in pairs(self:rsubs()) do
     if e.updating then e:update(dt) end
   end
 end

@@ -233,14 +233,15 @@ function entities.entity.add_proto_id(self, cont, proto_id)
   entity._link(self.id, proto_id, self)
 end
 
--- return all sub ids, recursively, as a set
-function entities.entity.rsub_ids(self, cont)
+-- return all subs, recursively, as a set
+function entities.entity.rsubs(self, cont)
   local result = {}
   local function collect(e)
     for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
-      if not result[sub_id] then
-        result[sub_id] = true
-        collect(entity.get(sub_id))
+      local e = entity.get(sub_id)
+      if not result[e] then
+        result[e] = true
+        collect(e)
       end
     end
   end
