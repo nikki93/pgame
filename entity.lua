@@ -78,11 +78,11 @@ entity.meta = {
       -- the entrypoint is a wrapper that starts off the chain
       local function entrypoint(self, ...)
         local ord = entity._proto_order(self)
-        local i = 0
+        local i = #ord + 1
         local function cont(...)
           while true do
-            i = i + 1
-            if i > #ord then return nil end
+            i = i - 1
+            if i < 1 then return nil end
             local pm = rawget(ord[i], '_methods')[k]
             if pm then return pm.func(self, cont, ...) end
           end
@@ -100,22 +100,23 @@ entity.meta = {
   end
 }
 
--- order in which protos are visited for methods, an array of objects (not ids)
--- the order is depth first and left to right in order of 'proto_ids' array,
--- with rprotos appearing only once
+-- /reverse/ of order in which protos are visited for methods, an array of
+-- objects (not ids) -- the order is the reverse of the topological sort order,
+-- so that entities appear after all their protos and ties are broken in
+-- right-left order of proto_ids list
 function entity._proto_order(e)
   local ord = {}
   local vis = {} -- set version of above
 
   local function visit(e)
-    if not vis[e.id] then
-      vis[e.id] = true
-      table.insert(ord, e)
-    end
-    for _, proto_id in ipairs(rawget(e, 'proto_ids') or {}) do
-      local p = entity.get(proto_id)
+    if vis[e.id] then return end
+    vis[e.id] = true
+    local pids = rawget(e, 'proto_ids')
+    for i = #pids, 1, -1 do
+      local p = entity.get(pids[i])
       visit(p)
     end
+    table.insert(ord, e)
   end
   visit(e)
   return ord
