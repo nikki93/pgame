@@ -322,8 +322,32 @@ function entity.load(buf)
     setmetatable(ent, entity.meta)
   end
 
+  -- add to entity table
   for _, ent in ipairs(ents) do
     entities[ent.id] = ent
+  end
+
+  -- finally, remove inexistent subs and protos
+  local warn = {}
+  for _, ent in ipairs(ents) do
+    local bad_ids = {}
+    local ss = rawget(ent, 'sub_ids')
+    for sub_id in pairs(ss) do
+      if not entities[sub_id] then bad_ids[sub_id] = true end
+    end
+    for bad_id in pairs(bad_ids) do ss[bad_id] = nil end
+
+    local pp = rawget(ent, 'proto_ids')
+    for i = #pp, 1, -1 do
+      if not entities[pp[i]] then
+        warn[pp[i]] = true
+        table.remove(pp, i)
+      end
+    end
+  end
+  for id in pairs(warn) do
+    print("warning: couldn't find proto with id "
+            .. entity.stringify_id(id) .. ", ignored")
   end
 end
 
