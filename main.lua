@@ -3,6 +3,10 @@
 function love.load()
   love.window.setMode(800, 600, { x = 629, y = 56 })
 
+  -- libraries
+  serpent = require('serpent')
+  dbg = require('debugger')
+
   -- utilities
   require('util')
 
@@ -32,7 +36,6 @@ end
 
 -- run -------------------------------------------------------------------------
 
-local dbg = require('debugger')
 local function safe_call(f)
   local succ, err = dbg.call(f)
   if not succ then
