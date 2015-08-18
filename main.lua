@@ -32,10 +32,14 @@ end
 
 -- run -------------------------------------------------------------------------
 
+local dbg = require('debugger')
 local function safe_call(f)
-  local succ, err = xpcall(f, debug.traceback)
+  local succ, err = dbg.call(f)
   if not succ then
-    print(err)
+    -- avoid dt spike by skipping next frame, but also manually update scratch
+    -- in case there's some new code
+    entities.update.skip_next_frame = true
+    entities.scratch:update(0.01)
   end
 end
 
