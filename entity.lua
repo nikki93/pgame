@@ -179,6 +179,38 @@ end
 
 entity._create('entity')
 
+-- immediately forget an entity and disconnect its sub/proto links -- remember
+-- to call cont() (generally at end) while overriding!
+function entities.entity.destroy(self, cont)
+  -- remove from subs' list of proto_ids
+  for sub_id in pairs(rawget(self, 'sub_ids')) do
+    local ps = rawget(entity.get(sub_id), 'proto_ids')
+    for i = 1, #ps do if ps[i] == self.id then table.remove(ps, i) end end
+  end
+
+  -- remove from protos' sets of sub_ids
+  for _, proto_id in pairs(rawget(self, 'proto_ids')) do
+    rawget(entity.get(proto_id), 'sub_ids')[self.id] = nil
+  end
+
+  entities[self.id] = nil
+end
+
+-- mark an entity to be destroyed on the next entities.entity:cleanup() call
+entity._destroy_marks = { ord = {}, ids = {} }
+function entities.entity.mark_destroy(self, cont)
+  if not entity._destroy_marks.ids[self.id] then
+    table.insert(entity._destroy_marks.ord, self.id)
+    entity._destroy_marks.ids[self.id] = true
+  end
+end
+
+-- destroy all entities marked with :mark_destroy() since last cleanup
+function entities.entity.cleanup(self, cont)
+  for _, id in ipairs(entity._destroy_marks.ord) do entity.get(id):destroy() end
+  entity._destroy_marks = { ord = {}, ids = {} }
+end
+
 -- add entity with id proto_id as a proto
 function entities.entity.add_proto_id(self, cont, proto_id)
   entity._link(self.id, proto_id, self)

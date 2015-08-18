@@ -22,6 +22,7 @@ end
 
 function love.update(dt)
   entities.update:update_rsubs(dt)
+  entities.entity:cleanup()
 end
 
 function love.draw()
