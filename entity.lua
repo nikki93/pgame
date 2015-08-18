@@ -277,7 +277,7 @@ function entity.load(buf)
 
   for _, ent in ipairs(ents) do
     -- uniqify id -- TODO: do cgame-style deep id resolution
-    if type(ent.id) ~= string then
+    if type(ent.id) ~= 'string' then
       rawset(ent, 'id', entity._next_id())
     end
     rawset(ent, '_methods', {})
