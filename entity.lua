@@ -33,13 +33,37 @@
 -- namespace for all entity meta stuff
 entity = {}
 
--- this table with store all entities that exist, so that entities[o.id] == o,
+
+-- id handling -----------------------------------------------------------------
+
+-- ids are either plains strings or special 'unique id' objects that are
+-- generated when no name is provided
+
+-- this table stores all entities that exist, so that entities[o.id] == o,
 -- where o is an entity
 entities = {}
 
 -- same as entities[id], but error if not present
 function entity.get(id)
-  return assert(entities[id], 'no entity with id ' .. id)
+  local e = entities[id]
+  if e == nil then
+    error ('no entity with id ' .. tostring(id)) -- avoid concat when no error
+  end
+  return e
+end
+
+-- nicer stringification of unique ids
+entity._uniq_to_string = function (o)
+  getmetatable(o).__tostring = nil
+  local s = tostring(o):gsub('^%w+: ', '')
+  getmetatable(o).__tostring = entity._uniq_to_string
+  return s
+end
+entity._uniq_meta = { __tostring = entity._uniq_to_string }
+
+-- generate a new unique id
+function entity._gen_uniq()
+  return setmetatable({}, entity._uniq_meta)
 end
 
 
@@ -137,17 +161,6 @@ function entity._link(sub, proto, s, p)
   rawset(s, 'proto_ids', ps)
 end
 
-entity.next_id = 0
-function entity._next_id()
-  local id
-  while entities[entity.next_id] ~= nil do
-    entity.next_id = entity.next_id + 1
-  end
-  id = entity.next_id
-  entity.next_id = entity.next_id + 1
-  return id
-end
-
 -- create and return new entity with given id and no protos -- you really
 -- should just use entity.create which ensures 'entity' is an rproto
 function entity._create(id)
@@ -157,7 +170,7 @@ function entity._create(id)
       error('entity with id ' .. id .. ' already exists!')
     end
   else
-    id = entity._next_id()
+    id = entity._gen_uniq()
   end
 
   -- create and return entity
@@ -276,9 +289,8 @@ function entity.load(buf)
   end
 
   for _, ent in ipairs(ents) do
-    -- uniqify id -- TODO: do cgame-style deep id resolution
     if type(ent.id) ~= 'string' then
-      rawset(ent, 'id', entity._next_id())
+      setmetatable(ent.id, entity._uniq_meta)
     end
     rawset(ent, '_methods', {})
 
