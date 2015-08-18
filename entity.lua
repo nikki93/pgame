@@ -30,6 +30,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local serpent = require('serpent')
+
 
 -- namespace for all entity meta stuff
 entity = {}
@@ -137,9 +139,19 @@ function entity._link(sub, proto, s, p)
   rawset(s, 'proto_ids', ps)
 end
 
+entity.next_id = 0
+function entity._next_id()
+  local id
+  while entities[entity.next_id] ~= nil do
+    entity.next_id = entity.next_id + 1
+  end
+  id = entity.next_id
+  entity.next_id = entity.next_id + 1
+  return id
+end
+
 -- create and return new entity with given id and no protos -- you really
 -- should just use entity.create which ensures 'entity' is an rproto
-entity.next_id = 0
 function entity._create(id)
   -- id a string? make sure no clash, else find next numeric id
   if type(id) == 'string' then
@@ -147,11 +159,7 @@ function entity._create(id)
       error('entity with id ' .. id .. ' already exists!')
     end
   else
-    while entities[entity.next_id] ~= nil do
-      entity.next_id = entity.next_id + 1
-    end
-    id = entity.next_id
-    entity.next_id = entity.next_id + 1
+    id = entity._next_id()
   end
 
   -- create and return entity
@@ -216,3 +224,58 @@ function entity.create_named(name, proto_ids)
   end
   return e
 end
+
+
+-- save/load -------------------------------------------------------------------
+
+-- save a bunch of entities to a buffer -- ids can be a single id or an array
+function entity.save(ids)
+  if type(ids) ~= 'table' then ids = { ids } end
+  -- save everything except methods
+  local keyallow = setmetatable({ _methods = false },
+    { __index = function () return true end })
+  return serpent.dump(map(entity.get, ids), { keyallow = keyallow })
+end
+
+-- load entities from a buffer
+function entity.load(buf)
+  local success, ents = serpent.load(buf)
+  if not success then
+    print('loading buffer failed: ')
+    print(tostring(ents))
+  end
+
+  for _, ent in ipairs(ents) do
+    -- uniqify id -- TODO: do cgame-style deep id resolution
+    if type(ent.id) ~= string then
+      rawset(ent, 'id', entity._next_id())
+    end
+    rawset(ent, '_methods', {})
+
+    -- if already exists with id, copy old methods, merge in old subs
+    local old = entities[ent.id]
+    if old then
+      rawset(ent, '_methods', rawget(old, '_methods'))
+      local ss = rawget(ent, 'sub_ids')
+      for sub_id in pairs(rawget(old, 'sub_ids')) do
+        ss[sub_id] = true
+      end
+    end
+
+    -- merge into subs of existing entities as protos
+    for _, proto_id in ipairs(rawget(ent, 'proto_ids')) do
+      local p = entities[proto_id]
+      if p then
+        rawget(p, 'sub_ids')[ent.id] = true
+      end
+    end
+
+    setmetatable(ent, entity.meta)
+  end
+
+  for _, ent in ipairs(ents) do
+    entities[ent.id] = ent
+  end
+end
+
+
