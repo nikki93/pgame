@@ -43,11 +43,18 @@ entity = {}
 -- where o is an entity
 entities = {}
 
+-- stringify an id -- string ids get surrounded with quotes
+function entity.stringify_id(id)
+  if type(id) == 'string' then return "'" .. id .. "'" end
+  return tostring(id)
+end
+
 -- same as entities[id], but error if not present
 function entity.get(id)
   local e = entities[id]
   if e == nil then
-    error ('no entity with id ' .. tostring(id)) -- avoid concat when no error
+    -- avoid concat when no error
+    error ('no entity with id ' .. entity.stringify_id(id))
   end
   return e
 end
