@@ -271,13 +271,13 @@ end
 
 -- save/load -------------------------------------------------------------------
 
--- save a bunch of entities to a buffer -- ids can be a single id or an array
-function entity.save(ids)
-  if type(ids) ~= 'table' then ids = { ids } end
+-- save entities to a buffer -- ents can be a single entity or an array
+function entity.save(ents)
+  if type(ents) ~= 'table' then ents = { ents } end
   -- save everything except methods
   local keyallow = setmetatable({ _methods = false },
     { __index = function () return true end })
-  return serpent.dump(map(entity.get, ids), { keyallow = keyallow })
+  return serpent.dump(ents, { keyallow = keyallow })
 end
 
 -- load entities from a buffer
@@ -320,10 +320,10 @@ function entity.load(buf)
   end
 end
 
--- save bunch of entities to a file, ids specified as in entity.save(...)
-function entity.save_file(filename, ids)
+-- save bunch of entities to a file, ents specified as in entity.save(...)
+function entity.save_file(filename, ents)
   local f = assert(io.open(filename, 'w'))
-  f:write(entity.save(ids))
+  f:write(entity.save(ents))
   f:close()
 end
 
