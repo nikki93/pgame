@@ -4,12 +4,14 @@
 --- defines basic sub/proto logic and the entity 'entity' that is an rproto
 --- for all entities, as detailed below:
 ---
+--- basics:
 ---    - an entity is simply a table with entity.meta as its metatable, but
 ---      its best to use the entity creation utilities below which handle some
 ---      other bookkeeping
 ---    - entities can keep 'slots' which are named places for holding data --
 ---      these are simply key-value pairs in the entity table
 ---
+--- sub/proto:
 ---    - if x is a 'proto' of y then y is a 'sub' of x
 ---    - if x_1 is a proto of x_2 is a proto of ... is a proto of x_n, then
 ---      x_1 is an 'rproto' (recursive proto) of x_n
@@ -17,15 +19,31 @@
 ---      x_1 is an 'rsub' of x_n
 ---    - no entity is an rproto or rsub of itself
 ---
----    - protos are maintained in an order
+--- slot lookup:
+---    - protos of an entity are maintained in an order
 ---    - slot access in x looks in x first, then recursively in protos depth
 ---      first in left-right order of protos
 ---    - slots can be 'methods' which are functions called with a 'self' and
 ---      a 'cont' argument, so that calling x:m(a, b, ...) results in a call
----      to x.m(x, cont, a, b, ...)
+---      to x.m(x, cont, a, b, ...) with x evaluated just once
 ---        - self is the receiver of the method call
 ---        - cont is a function which, when called, calls the next method in
----          the method call chain defined in the same order as slot lookup
+---          the method call chain defined in topological sort order so that
+---          methods by subs are called before those by protos, with ties
+---          broken in left-right order of protos
+---
+--- ids:
+---    - protos are listed by 'id,' a kind of object used to identify entities
+---    - an entity's id can be a string, in which case it is a 'named' entity,
+---      otherwise it is given a generated id that is always unique
+---
+--- save/load:
+---    - entities can be saved and loaded to and from in-memory or file buffers
+---    - on loading, if an entity is named, it replaces the existing entity of
+---      the same name (like Smalltalk's 'become:'), else it is just added
+---      as a new entity
+---    - on loading, if an entity's proto list refers to an id that isn't found,
+---      a warning is generated and that entry in the proto list is ignored
 ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
