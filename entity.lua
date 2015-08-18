@@ -278,4 +278,19 @@ function entity.load(buf)
   end
 end
 
+-- save bunch of entities to a file, ids specified as in entity.save(...)
+function entity.save_file(filename, ids)
+  local f = assert(io.open(filename, 'w'))
+  f:write(entity.save(ids))
+  f:close()
+end
+
+-- load entities from a file
+function entity.load_file(filename)
+  local f = assert(io.open(filename, 'r'))
+  local b = f:read('*a')
+  f:close()
+  entity.load(b)
+end
+
 
