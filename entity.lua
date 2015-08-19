@@ -85,8 +85,8 @@ entity.meta = {
 
     -- check recursively in each proto
     for _, proto in ipairs(rawget(o, 'proto_ids')) do
-      r = entities[proto]
-      if r then r = r[k] end
+      r = entity.get(proto)
+      r = r[k]
       if r then return r end
     end
     return nil
@@ -308,7 +308,8 @@ function entity.load(buf)
     entities[ent.id] = ent
   end
 
-  -- finally, remove inexistent subs and protos
+  -- finally, remove inexistent subs and protos -- do this after adding all to
+  -- entity table so that we don't miss newly loaded subs/protos
   local warn = {}
   for _, ent in ipairs(ents) do
     local bad_ids = {}
