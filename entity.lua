@@ -328,7 +328,9 @@ end
 
 -- save entities to a image -- ents must be an array of entities
 function entity.save(ents)
-  -- save everything except methods
+  -- save everything except method entries (they're reloaded on load by name)
+  local keyallow = setmetatable({ _method_entries = false },
+    { __index = function () return true end })
   return serpent.dump(ents, { keyallow = keyallow })
 end
 
@@ -342,6 +344,8 @@ function entity.load(buf)
   end
 
   for _, ent in ipairs(ents) do
+    rawset(ent, '_method_entries', {})
+
     -- if already exists with id merge in old subs and remove leftover protos
     local old = entity._ids[ent.id]
     if old then
