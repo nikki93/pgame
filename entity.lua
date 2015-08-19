@@ -342,12 +342,26 @@ function entity.load(buf)
   end
 
   for _, ent in ipairs(ents) do
-    -- if already exists with id merge in old subs
+    -- if already exists with id merge in old subs and remove leftover protos
     local old = entity._ids[ent.id]
     if old then
       local ss = rawget(ent, 'sub_ids')
       for sub_id in pairs(rawget(old, 'sub_ids')) do
         ss[sub_id] = true
+      end
+
+      local ps = rawget(ent, 'proto_ids')
+      for _, old_proto_id in ipairs(rawget(old, 'proto_ids')) do
+        local found = false
+        for _, proto_id in ipairs(ps) do
+          if old_proto_id == proto_id then
+            found = true
+            break
+          end
+        end
+        if not found then
+          rawget(entity.get(old_proto_id), 'sub_ids')[old.id] = nil
+        end
       end
     end
 
