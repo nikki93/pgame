@@ -42,7 +42,7 @@
 ---    - named entities can be obtained as entities.player etc.
 ---
 --- save/load:
----    - entities can be saved and loaded to and from in-memory or file buffers
+---    - entities can be saved and loaded to and from in-memory or file images
 ---    - on loading, an entity replaces the existing entity with the same id
 ---      (like Smalltalk's 'become:') if one exists, else it is just added as a
 ---      new entity
@@ -319,18 +319,18 @@ end
 
 -- save/load -------------------------------------------------------------------
 
--- save entities to a buffer -- ents must be an array of entities
+-- save entities to a image -- ents must be an array of entities
 function entity.save(ents)
   -- save everything except methods
   return serpent.dump(ents, { keyallow = keyallow })
 end
 
--- load entities from a buffer -- returns the array of entities as passed to
--- entity.save(...) to save the buffer
+-- load entities from a image -- returns the array of entities as passed to
+-- entity.save(...) to save the image
 function entity.load(buf)
   local success, ents = serpent.load(buf)
   if not success then
-    print('loading buffer failed: ')
+    print('loading image failed: ')
     print(tostring(ents))
   end
 
@@ -393,14 +393,14 @@ function entity.load(buf)
   return ents
 end
 
--- save bunch of entities to a file, ents specified as in entity.save(...)
+-- save bunch of entities to a file image, ents specified as in entity.save(...)
 function entity.save_file(filename, ents)
   local f = assert(io.open(filename, 'w'))
   f:write(entity.save(ents))
   f:close()
 end
 
--- load entities from a file -- returns the array of entities as passed to
+-- load entities from a file image -- returns the array of entities as passed to
 -- entity.save_file(...) to save to the file
 function entity.load_file(filename)
   local f = assert(io.open(filename, 'r'))
