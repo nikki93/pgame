@@ -1,10 +1,11 @@
 -- rotator
 
-entity.create_named('rotator', { 'update', 'transform' })
+entity.create_named('rotator', { entities.update,
+                                 entities.transform })
 
 entities.rotator.rotation_speed = 30
 
-function entities.rotator.update(self, cont, dt)
+function methods.rotator.update(self, cont, dt)
   cont(dt)
   self.rotation = self.rotation + self.rotation_speed * dt
 end
@@ -12,12 +13,14 @@ end
 
 -- player
 
-entity.create_named('player', { 'drawable', 'update', 'transform' })
+entity.create_named('player', { entities.drawable,
+                                entities.update,
+                                entities.transform })
 
 entities.player.dir = 1
 entities.player.position = { 10, 200 }
 
-function entities.player.update(self, cont, dt)
+function methods.player.update(self, cont, dt)
   cont(dt)
 
   if self.position[1] > 700 then self.dir = -1 end
@@ -26,7 +29,7 @@ function entities.player.update(self, cont, dt)
   self.position = { self.position[1] + self.dir * 200 * dt, self.position[2] }
 end
 
-function entities.player.draw(self, cont)
+function methods.player.draw(self, cont)
   cont()
   love.graphics.push()
   love.graphics.translate(unpack(self.position))
@@ -39,6 +42,8 @@ end
 -- scene
 
 function test_scene()
-  the_player = entity.create({ 'alive', 'player', 'rotator' })
+  the_player = entity.create({ entities.alive,
+                               entities.player,
+                               entities.rotator })
 end
 

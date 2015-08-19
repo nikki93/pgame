@@ -1,7 +1,7 @@
 -- continuously checks the given file for modification and runs lua code in it
 -- when modified -- can be used to 'eval' from text editors
 
-entity.create_named('scratch', { 'update' })
+entity.create_named('scratch', { entities.update })
 
 entities.scratch.updating = true
 entities.scratch.file_path = 'scratch-buf.lua'

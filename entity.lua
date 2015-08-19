@@ -55,18 +55,83 @@
 -- namespace for all entity meta stuff
 entity = {}
 
--- this table stores all entities that exist, so that entities[o.id] == o, where
--- o is an entity
-entities = {}
+-- this table stores all entities that exist, so that entity._ids[o.id] == o,
+-- where o is an entity
+entity._ids = {}
 
--- same as entities[id], but error if not present
+-- same as entity._ids[id], but error if not present
 function entity.get(id)
-  local e = entities[id]
+  local e = entity._ids[id]
   if e == nil then
     -- avoid concat when no error
     error ("no entity with id '" .. tostring(id) .. "'")
   end
   return e
+end
+
+
+-- names -----------------------------------------------------------------------
+
+-- methods is a table that can be used to associate names with methods by
+-- setting methods.name.methodname, or to remove associations by setting
+-- methods.name or methods.name.methodname to nil
+
+entity._method_table_meta = {
+  __newindex = function (o, k, v)
+    -- need a call-next-method continuation -- the continuation is a closure
+    -- that iterates through the proto order, the entrypoint is a wrapper that
+    -- starts off the chain
+    local function entrypoint(self, ...)
+      local ord = entity._proto_order(self)
+      local i = #ord + 1
+      local function cont(...)
+        while true do
+          i = i - 1
+          if i < 1 then return nil end
+          local pm = rawget(ord[i], 'name')
+          if pm ~= nil then
+            pm = rawget(methods, pm)
+            if pm ~= nil then
+              pm = pm[k]
+              if pm then return pm.func(self, cont, ...) end
+            end
+          end
+        end
+      end
+      return cont(...)
+    end
+    rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v }
+  end,
+
+  __index = function (o, k)
+    return rawget(o, '_entries')[k]
+  end
+}
+
+entity._methods_meta = {
+  __index = function (o, k)
+    local v = setmetatable({ _entries = {} }, entity._method_table_meta)
+    rawset(o, k, v)
+    return v
+  end
+}
+
+methods = setmetatable({}, entity._methods_meta)
+
+-- entities by name, inherited into global environment for convenience
+entities = {}
+
+-- associate a name with an entity -- can use nil name to remove name
+function entity._name_entity(name, ent)
+  local old_name = rawget(ent, 'name')
+  if old_name ~= nil and old_name ~= name then
+    -- has old name, rename
+    entities[old_name] = nil
+    if name ~= nil then methods[name] = methods[old_name] end
+    methods[old_name] = nil
+  end
+  rawset(ent, 'name', name)
+  if name ~= nil then entities[name] = ent end
 end
 
 
@@ -80,8 +145,16 @@ entity.meta = {
     -- check in o
     r = rawget(o, k)
     if r ~= nil then return r end
-    r = rawget(o, '_methods')[k]
-    if r ~= nil then return r.entrypoint end
+
+    -- check for method
+    r  = rawget(o, 'name')
+    if r ~= nil then
+      r  = rawget(methods, r)
+      if r ~= nil then
+        r = r[k]
+        if r ~= nil then return r.entrypoint end
+      end
+    end
 
     -- check recursively in each proto
     for _, proto in ipairs(rawget(o, 'proto_ids')) do
@@ -96,24 +169,6 @@ entity.meta = {
     if v == nil then
       -- remove previous method structure if exists
       rawget(o, '_methods')[k] = nil
-    elseif type(v) == 'function' then
-      -- function? it's gonna be a method, need a call-next-method continuation
-      -- the continuation is a closure that iterates through the proto order the
-      -- entrypoint is a wrapper that starts off the chain
-      local function entrypoint(self, ...)
-        local ord = entity._proto_order(self)
-        local i = #ord + 1
-        local function cont(...)
-          while true do
-            i = i - 1
-            if i < 1 then return nil end
-            local pm = rawget(ord[i], '_methods')[k]
-            if pm then return pm.func(self, cont, ...) end
-          end
-        end
-        return cont(...)
-      end
-      rawget(o, '_methods')[k] = { entrypoint = entrypoint, func = v }
     else
       rawset(o, k, v)
     end
@@ -162,28 +217,28 @@ function entity._link(sub, proto, s, p)
   rawset(s, 'proto_ids', ps)
 end
 
--- create and return new entity with given id and no protos -- you really
+-- create and return new entity with new unique id and no protos -- you really
 -- should just use entity.create which ensures 'entity' is an rproto
-function entity._create(id)
+function entity._create()
+  local id = uuid()
   -- create and return entity
   local e = {
-    _methods = {},
     id = id,
     proto_ids = {}, sub_ids = {}
   }
   setmetatable(e, entity.meta)
-  entities[id] = e
+  entity._ids[id] = e
   return e
 end
 
 
 -- 'entity' entity -------------------------------------------------------------
 
-entity._create('entity')
+entity._name_entity('entity', entity._create())
 
 -- immediately forget an entity and disconnect its sub/proto links -- remember
 -- to call cont() (generally at end) while overriding!
-function entities.entity.destroy(self, cont)
+function methods.entity.destroy(self, cont)
   -- remove from subs' list of proto_ids
   for sub_id in pairs(rawget(self, 'sub_ids')) do
     local ps = rawget(entity.get(sub_id), 'proto_ids')
@@ -195,12 +250,13 @@ function entities.entity.destroy(self, cont)
     rawget(entity.get(proto_id), 'sub_ids')[self.id] = nil
   end
 
-  entities[self.id] = nil
+  entity._ids[self.id] = nil
+  if self.name then entities[self.name] = nil end
 end
 
 -- mark an entity to be destroyed on the next entities.entity:cleanup() call
 entity._destroy_marks = { ord = {}, ids = {} }
-function entities.entity.mark_destroy(self, cont)
+function methods.entity.mark_destroy(self, cont)
   if not entity._destroy_marks.ids[self.id] then
     table.insert(entity._destroy_marks.ord, self.id)
     entity._destroy_marks.ids[self.id] = true
@@ -208,18 +264,18 @@ function entities.entity.mark_destroy(self, cont)
 end
 
 -- destroy all entities marked with :mark_destroy() since last cleanup
-function entities.entity.cleanup(self, cont)
+function methods.entity.cleanup(self, cont)
   for _, id in ipairs(entity._destroy_marks.ord) do entity.get(id):destroy() end
   entity._destroy_marks = { ord = {}, ids = {} }
 end
 
 -- add entity with id proto_id as a proto
-function entities.entity.add_proto_id(self, cont, proto_id)
+function methods.entity.add_proto_id(self, cont, proto_id)
   entity._link(self.id, proto_id, self)
 end
 
 -- return all subs, recursively, as a set
-function entities.entity.rsubs(self, cont)
+function methods.entity.rsubs(self, cont)
   local result = {}
   local function collect(e)
     for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
@@ -235,27 +291,28 @@ function entities.entity.rsubs(self, cont)
 end
 
 -- called on string conversion with tostring(...)
-function entities.entity.to_string(self, cont)
+function methods.entity.to_string(self, cont)
   return '<entities[' .. tostring(self.id) .. ']>'
 end
 
 
 -- entity creation utilities ---------------------------------------------------
 
--- create an entity with given ids of entities as proto_ids
-function entity.create(proto_ids)
-  return entity.create_named(uuid(), proto_ids)
+-- create an entity with given array of entities as protos
+function entity.create(protos)
+  return entity.create_named(nil, protos)
 end
 
--- create an entity with given id, and given ids of entities as proto_ids
-function entity.create_named(id, proto_ids)
-  local e = entity._create(id)
-  if proto_ids then
-    for _, proto in ipairs(proto_ids) do entity._link(e.id, proto, e) end
+-- create an entity with given name and array of entities as protos
+function entity.create_named(name, protos)
+  local e = entity._create()
+  if protos then
+    for _, proto in ipairs(protos) do entity._link(e.id, proto.id, e) end
   end
   if #rawget(e, 'proto_ids') == 0 then
-    entity._link(e.id, 'entity', e)
+    entity._link(e.id, entities.entity.id, e)
   end
+  if name then entity._name_entity(name, e) end
   return e
 end
 
@@ -265,8 +322,6 @@ end
 -- save entities to a buffer -- ents must be an array of entities
 function entity.save(ents)
   -- save everything except methods
-  local keyallow = setmetatable({ _methods = false },
-    { __index = function () return true end })
   return serpent.dump(ents, { keyallow = keyallow })
 end
 
@@ -280,12 +335,9 @@ function entity.load(buf)
   end
 
   for _, ent in ipairs(ents) do
-    rawset(ent, '_methods', {})
-
-    -- if already exists with id, copy old methods, merge in old subs
-    local old = entities[ent.id]
+    -- if already exists with id merge in old subs
+    local old = entity._ids[ent.id]
     if old then
-      rawset(ent, '_methods', rawget(old, '_methods'))
       local ss = rawget(ent, 'sub_ids')
       for sub_id in pairs(rawget(old, 'sub_ids')) do
         ss[sub_id] = true
@@ -294,7 +346,7 @@ function entity.load(buf)
 
     -- merge into subs of existing entities as protos
     for _, proto_id in ipairs(rawget(ent, 'proto_ids')) do
-      local p = entities[proto_id]
+      local p = entity._ids[proto_id]
       if p then
         rawget(p, 'sub_ids')[ent.id] = true
       end
@@ -305,23 +357,23 @@ function entity.load(buf)
 
   -- add to entity table
   for _, ent in ipairs(ents) do
-    entities[ent.id] = ent
+    entity._ids[ent.id] = ent
   end
 
-  -- finally, remove inexistent subs and protos -- do this after adding all to
+  -- remove inexistent subs and protos -- do this after adding all to
   -- entity table so that we don't miss newly loaded subs/protos
   local warn = {}
   for _, ent in ipairs(ents) do
     local bad_ids = {}
     local ss = rawget(ent, 'sub_ids')
     for sub_id in pairs(ss) do
-      if not entities[sub_id] then bad_ids[sub_id] = true end
+      if not entity._ids[sub_id] then bad_ids[sub_id] = true end
     end
     for bad_id in pairs(bad_ids) do ss[bad_id] = nil end
 
     local pp = rawget(ent, 'proto_ids')
     for i = #pp, 1, -1 do
-      if not entities[pp[i]] then
+      if not entity._ids[pp[i]] then
         warn[pp[i]] = true
         table.remove(pp, i)
       end
@@ -330,6 +382,12 @@ function entity.load(buf)
   for id in pairs(warn) do
     print("warning: couldn't find proto with id '"
             .. tostring(id) .. "', ignored")
+  end
+
+  -- associate with names
+  for _, ent in ipairs(ents) do
+    local name = rawget(ent, 'name')
+    if name then entity._name_entity(name, ent) end
   end
 
   return ents
