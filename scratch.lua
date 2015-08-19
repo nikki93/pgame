@@ -25,8 +25,7 @@ function entities.scratch.update(self, cont, dt)
         print('loading scratch failed: ')
         print(tostring(chunk))
       else
-        ok, err = xpcall(chunk, debug.traceback)
-        if not ok then print(err) end
+        chunk()
       end
     end
   end
