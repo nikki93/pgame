@@ -33,13 +33,21 @@
 ---          broken in left-right order of protos
 ---
 --- ids:
----    - protos are listed by 'id,' an object used to identify entities
----    - an id can be provided when creating an entity (usually a
----      human-readable string such as 'player'), else a universally unique one
----      is generated
+---    - each entity has a unique id used to identify it, which is generated
+---      when it is created
 ---    - use ids instead of direct entity references to ensure consistency
 ---      across saving and loading
----    - named entities can be obtained as entities.player etc.
+---
+--- names:
+---    - entities can be given human-readable names for easier access and for
+---      associating methods
+---    - methods are defined as:
+---          function methods.<name>.<methodname>(self, cont, ...) ... end
+---      which means that the entities with the name <name> will have that
+---      method (whether it already exists or will be created or loaded in the
+---      future)
+---    - this is so that methods can be written in source files and because
+---      they don't get properly serialized
 ---
 --- save/load:
 ---    - entities can be saved and loaded to and from in-memory or file images
@@ -118,7 +126,7 @@ entity._methods_meta = {
 
 methods = setmetatable({}, entity._methods_meta)
 
--- entities by name, inherited into global environment for convenience
+-- entities by name
 entities = {}
 
 -- associate a name with an entity -- can use nil name to remove name
