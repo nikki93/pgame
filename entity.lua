@@ -78,7 +78,12 @@ function entity.get(id)
 end
 
 
--- names -----------------------------------------------------------------------
+-- names/methods ---------------------------------------------------------------
+
+-- get the method structure for method named m on entity e
+function entity._get_method(e, m)
+  return rawget(e, '_method_entries')[m]
+end
 
 -- methods is a table that can be used to associate names with methods by
 -- setting methods.name.methodname, or to remove associations by setting
@@ -96,14 +101,8 @@ entity._method_table_meta = {
         while true do
           i = i - 1
           if i < 1 then return nil end
-          local pm = rawget(ord[i], 'name')
-          if pm ~= nil then
-            pm = rawget(methods, pm)
-            if pm ~= nil then
-              pm = pm[k]
-              if pm then return pm.func(self, cont, ...) end
-            end
-          end
+          local pm = entity._get_method(ord[i], k)
+          if pm then return pm.func(self, cont, ...) end
         end
       end
       return cont(...)
@@ -131,15 +130,19 @@ entities = {}
 
 -- associate a name with an entity -- can use nil name to remove name
 function entity._name_entity(name, ent)
+  -- update entities[...] map
   local old_name = rawget(ent, 'name')
   if old_name ~= nil and old_name ~= name then
-    -- has old name, rename
-    entities[old_name] = nil
-    if name ~= nil then methods[name] = methods[old_name] end
-    methods[old_name] = nil
+    entities[old_name] = nil -- has an old name
   end
   rawset(ent, 'name', name)
   if name ~= nil then entities[name] = ent end
+
+  -- associate methods
+  local method_table = rawget(methods, name)
+  if method_table then
+    rawset(ent, '_method_entries', rawget(method_table, '_entries'))
+  end
 end
 
 
@@ -155,14 +158,8 @@ entity.meta = {
     if r ~= nil then return r end
 
     -- check for method
-    r  = rawget(o, 'name')
-    if r ~= nil then
-      r  = rawget(methods, r)
-      if r ~= nil then
-        r = r[k]
-        if r ~= nil then return r.entrypoint end
-      end
-    end
+    r = entity._get_method(o, k)
+    if r ~= nil then return r.entrypoint end
 
     -- check recursively in each proto
     for _, proto in ipairs(rawget(o, 'proto_ids')) do
