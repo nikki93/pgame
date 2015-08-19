@@ -8,6 +8,7 @@ function love.load()
   dbg = require('debugger')
   require('socket') -- for uuid
   uuid = require('uuid')
+  uuid.seed()
 
   -- basic entities
   require('entity')
