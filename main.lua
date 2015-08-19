@@ -6,6 +6,8 @@ function love.load()
   -- libraries
   serpent = require('serpent')
   dbg = require('debugger')
+  require('socket') -- for uuid
+  uuid = require('uuid')
 
   -- basic entities
   require('entity')

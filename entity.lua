@@ -33,15 +33,19 @@
 ---          broken in left-right order of protos
 ---
 --- ids:
----    - protos are listed by 'id,' a kind of object used to identify entities
----    - an entity's id can be a string, in which case it is a 'named' entity,
----      otherwise it is given a generated id that is always unique
+---    - protos are listed by 'id,' an object used to identify entities
+---    - an id can be provided when creating an entity (usually a
+---      human-readable string such as 'player'), else a universally unique one
+---      is generated
+---    - use ids instead of direct entity references to ensure consistency
+---      across saving and loading
+---    - named entities can be obtained as entities.player etc.
 ---
 --- save/load:
 ---    - entities can be saved and loaded to and from in-memory or file buffers
----    - on loading, if an entity is named, it replaces the existing entity of
----      the same name (like Smalltalk's 'become:'), else it is just added
----      as a new entity
+---    - on loading, an entity replaces the existing entity with the same id
+---      (like Smalltalk's 'become:') if one exists, else it is just added as a
+---      new entity
 ---    - on loading, if an entity's proto list refers to an id that isn't found,
 ---      a warning is generated and that entry in the proto list is ignored
 ---
@@ -51,44 +55,18 @@
 -- namespace for all entity meta stuff
 entity = {}
 
-
--- id handling -----------------------------------------------------------------
-
--- ids are either plains strings or special 'unique id' objects that are
--- generated when no name is provided
-
 -- this table stores all entities that exist, so that entities[o.id] == o, where
 -- o is an entity
 entities = {}
-
--- stringify an id -- string ids get surrounded with quotes
-function entity.stringify_id(id)
-  if type(id) == 'string' then return "'" .. id .. "'" end
-  return tostring(id)
-end
 
 -- same as entities[id], but error if not present
 function entity.get(id)
   local e = entities[id]
   if e == nil then
     -- avoid concat when no error
-    error ('no entity with id ' .. entity.stringify_id(id))
+    error ("no entity with id '" .. tostring(id) .. "'")
   end
   return e
-end
-
--- nicer stringification of unique ids
-entity._uniq_to_string = function (o)
-  getmetatable(o).__tostring = nil
-  local s = tostring(o):gsub('^%w+: ', '')
-  getmetatable(o).__tostring = entity._uniq_to_string
-  return s
-end
-entity._uniq_meta = { __tostring = entity._uniq_to_string }
-
--- generate a new unique id
-function entity._gen_uniq()
-  return setmetatable({}, entity._uniq_meta)
 end
 
 
@@ -187,15 +165,6 @@ end
 -- create and return new entity with given id and no protos -- you really
 -- should just use entity.create which ensures 'entity' is an rproto
 function entity._create(id)
-  -- id a string? make sure no clash, else find next numeric id
-  if type(id) == 'string' then
-    if entities[id] then
-      error('entity with id ' .. id .. ' already exists!')
-    end
-  else
-    id = entity._gen_uniq()
-  end
-
   -- create and return entity
   local e = {
     _methods = {},
@@ -267,7 +236,7 @@ end
 
 -- called on string conversion with tostring(...)
 function entities.entity.to_string(self, cont)
-  return '<entities[' .. self.id .. ']>'
+  return '<entities[' .. tostring(self.id) .. ']>'
 end
 
 
@@ -275,14 +244,12 @@ end
 
 -- create an entity with given ids of entities as proto_ids
 function entity.create(proto_ids)
-  return entity.create_named(nil, proto_ids)
+  return entity.create_named(uuid(), proto_ids)
 end
 
--- create an entity with given string id, and given ids of entities as proto_ids
--- if name isn't a string, it is ignored (numeric id is generated)
-function entity.create_named(name, proto_ids)
-  if type(name) ~= 'string' then name = nil end
-  local e = entity._create(name)
+-- create an entity with given id, and given ids of entities as proto_ids
+function entity.create_named(id, proto_ids)
+  local e = entity._create(id)
   if proto_ids then
     for _, proto in ipairs(proto_ids) do entity._link(e.id, proto, e) end
   end
@@ -313,9 +280,6 @@ function entity.load(buf)
   end
 
   for _, ent in ipairs(ents) do
-    if type(ent.id) ~= 'string' then
-      setmetatable(ent.id, entity._uniq_meta)
-    end
     rawset(ent, '_methods', {})
 
     -- if already exists with id, copy old methods, merge in old subs
@@ -363,8 +327,8 @@ function entity.load(buf)
     end
   end
   for id in pairs(warn) do
-    print("warning: couldn't find proto with id "
-            .. entity.stringify_id(id) .. ", ignored")
+    print("warning: couldn't find proto with id '"
+            .. tostring(id) .. "', ignored")
   end
 
   return ents
