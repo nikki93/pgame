@@ -229,7 +229,8 @@ function entity._create()
   -- create and return entity
   local e = {
     id = id,
-    proto_ids = {}, sub_ids = {}
+    proto_ids = {}, sub_ids = {},
+    _method_entries = {}
   }
   setmetatable(e, entity.meta)
   entity._ids[id] = e
@@ -343,17 +344,10 @@ function entity.load(buf)
     print(tostring(ents))
   end
 
+  -- first pass: loaded entities might drop protos, clean up sub references
   for _, ent in ipairs(ents) do
-    rawset(ent, '_method_entries', {})
-
-    -- if already exists with id merge in old subs and remove leftover protos
     local old = entity._ids[ent.id]
     if old then
-      local ss = rawget(ent, 'sub_ids')
-      for sub_id in pairs(rawget(old, 'sub_ids')) do
-        ss[sub_id] = true
-      end
-
       local ps = rawget(ent, 'proto_ids')
       for _, old_proto_id in ipairs(rawget(old, 'proto_ids')) do
         local found = false
@@ -368,25 +362,35 @@ function entity.load(buf)
         end
       end
     end
-
-    -- merge into subs of existing entities as protos
-    for _, proto_id in ipairs(rawget(ent, 'proto_ids')) do
-      local p = entity._ids[proto_id]
-      if p then
-        rawget(p, 'sub_ids')[ent.id] = true
-      end
-    end
-
-    setmetatable(ent, entity.meta)
   end
 
-  -- add to entity table
+  -- second pass: loaded entities might adopt new protos
   for _, ent in ipairs(ents) do
+    for _, proto_id in ipairs(rawget(ent, 'proto_ids')) do
+      local p = entity._ids[proto_id]
+      if p then rawget(p, 'sub_ids')[ent.id] = true end
+    end
+  end
+
+  -- second pass: loaded entities might have to adopt existing entities as subs
+  for _, ent in ipairs(ents) do
+    local old = entity._ids[ent.id]
+    if old then
+      local ss = rawget(ent, 'sub_ids')
+      for sub_id in pairs(rawget(old, 'sub_ids')) do
+        ss[sub_id] = true
+      end
+    end
+  end
+
+  -- fourth pass: initialize method cache, metatable and add to entity._ids[...]
+  for _, ent in ipairs(ents) do
+    rawset(ent, '_method_entries', {})
+    setmetatable(ent, entity.meta)
     entity._ids[ent.id] = ent
   end
 
-  -- remove inexistent subs and protos -- do this after adding all to
-  -- entity table so that we don't miss newly loaded subs/protos
+  -- fifth pass: after loading, fix dangling sub/proto references
   local warn = {}
   for _, ent in ipairs(ents) do
     local bad_ids = {}
@@ -409,7 +413,7 @@ function entity.load(buf)
             .. tostring(id) .. "', ignored")
   end
 
-  -- associate with names
+  -- finally, associate with names -- this installs the methods too
   for _, ent in ipairs(ents) do
     local name = rawget(ent, 'name')
     if name then entity._name_entity(name, ent) end
