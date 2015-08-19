@@ -1,9 +1,11 @@
 -- rotator
 
-entity.create_named('rotator', { entities.update,
-                                 entities.transform })
+function bootstrap.rotator()
+  entity.create_named('rotator', { entities.update,
+                                   entities.transform })
 
-entities.rotator.rotation_speed = 30
+  entities.rotator.rotation_speed = 30
+end
 
 function methods.rotator.update(self, cont, dt)
   cont(dt)
@@ -13,12 +15,14 @@ end
 
 -- player
 
-entity.create_named('player', { entities.drawable,
-                                entities.update,
-                                entities.transform })
+function bootstrap.player()
+  entity.create_named('player', { entities.drawable,
+                                  entities.update,
+                                  entities.transform })
 
-entities.player.dir = 1
-entities.player.position = { 10, 200 }
+  entities.player.dir = 1
+  entities.player.position = { 10, 200 }
+end
 
 function methods.player.update(self, cont, dt)
   cont(dt)

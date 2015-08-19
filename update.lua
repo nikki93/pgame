@@ -1,9 +1,11 @@
 -- updated every frame
 
-entity.create_named('update')
+function bootstrap.update()
+  entity.create_named('update')
 
-entities.update.updating = false -- whether to receive update events
-entities.update.skip_next_frame = false -- to avoid dt spikes on process pause
+  entities.update.updating = false -- whether to receive update events
+  entities.update.skip_next_frame = false -- to avoid dt spikes on process pause
+end
 
 function methods.update.update(self, cont, dt) cont(dt) end
 

@@ -234,7 +234,9 @@ end
 
 -- 'entity' entity -------------------------------------------------------------
 
-entity._name_entity('entity', entity._create())
+function bootstrap.entity()
+  entity._name_entity('entity', entity._create())
+end
 
 -- immediately forget an entity and disconnect its sub/proto links -- remember
 -- to call cont() (generally at end) while overriding!

@@ -10,6 +10,10 @@ function love.load()
   uuid = require('uuid')
   uuid.seed()
 
+  -- bootstrap
+  require('scratch')
+  require('bootstrap')
+
   -- basic entities
   require('entity')
   require('update')
@@ -20,18 +24,16 @@ function love.load()
 
   -- test entities
   require('test')
-
-  test_scene()
 end
 
 function love.update(dt)
-  entities.update:update_rsubs(dt)
-  entities.entity:cleanup()
+  scratch.update()
+  if entities.update then entities.update:update_rsubs(dt) end
 end
 
 function love.draw()
   love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-  entities.drawable:draw_rsubs()
+  if entities.drawable then entities.drawable:draw_rsubs() end
 end
 
 
@@ -40,10 +42,8 @@ end
 local function safe_call(f)
   local succ, err = dbg.call(f)
   if not succ then
-    -- avoid dt spike by skipping next frame, but also manually update scratch
-    -- in case there's some new code
+    -- avoid dt spike by skipping next frame
     entities.update.skip_next_frame = true
-    entities.scratch:update(0.01)
   end
 end
 
