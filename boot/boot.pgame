@@ -1,1 +1,47 @@
-do local _={{id="f5e638cc78dd3259",proto_ids={},name="entity"},{id="c571a3227368b17e",drawing=false,proto_ids={"f5e638cc78dd3259"},name="drawable"},{rotation=0,id="d825c53d89d9cacb",position={10,10},proto_ids={"f5e638cc78dd3259"},name="transform"},{id="7bd3d5f5b3cdb13a",drawing=true,updating=true,proto_ids={"f5e638cc78dd3259"},name="alive"},{id="3ac340832f29c115",skip_next_frame=false,updating=false,proto_ids={"f5e638cc78dd3259"},name="update"}};return _;end
+do local _={
+ {
+  id="f5e638cc78dd3259",
+  proto_ids={},
+  name="entity"
+ },
+ {
+  id="c571a3227368b17e",
+  drawing=false,
+  proto_ids={
+   "f5e638cc78dd3259"
+  },
+  name="drawable"
+ },
+ {
+  rotation=0,
+  id="d825c53d89d9cacb",
+  position={
+   10,
+   10
+  },
+  proto_ids={
+   "f5e638cc78dd3259"
+  },
+  name="transform"
+ },
+ {
+  id="7bd3d5f5b3cdb13a",
+  drawing=true,
+  updating=true,
+  proto_ids={
+   "f5e638cc78dd3259"
+  },
+  name="alive"
+ },
+ {
+  id="3ac340832f29c115",
+  skip_next_frame=false,
+  updating=false,
+  proto_ids={
+   "f5e638cc78dd3259"
+  },
+  name="update"
+ }
+}
+return _
+end

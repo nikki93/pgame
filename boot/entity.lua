@@ -309,7 +309,7 @@ function entity.save(ents)
   -- skip saving of caches
   local keyallow = setmetatable({ _method_entries = false, _sub_ids = false },
     { __index = function () return true end })
-  return serpent.dump(ents, { keyallow = keyallow })
+  return serpent.dump(ents, { indent = ' ', keyallow = keyallow })
 end
 
 -- load entities from an image -- returns the array of entities as passed to
