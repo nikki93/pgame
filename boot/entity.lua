@@ -381,8 +381,9 @@ end
 -- load entities from a file image -- returns the array of entities as passed to
 -- entity.save_file(...) to save to the file
 function entity.load_file(filename)
-  local f = assert(io.open(filename, 'r'))
-  local b = f:read('*a')
+  local f = love.filesystem.newFile(filename)
+  f:open('r')
+  local b = f:read()
   f:close()
   return entity.load(b)
 end
