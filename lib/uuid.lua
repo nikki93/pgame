@@ -129,10 +129,10 @@ function M.new(hwaddr)
   -- set the variant
   bytes[9] = BITWISE(bytes[7], 0x3f, MATRIX_AND)
   bytes[9] = BITWISE(bytes[7], 0x80, MATRIX_OR)
-  return  INT2HEX(bytes[1])..INT2HEX(bytes[2])..INT2HEX(bytes[3])..INT2HEX(bytes[4]).."-"..
-         INT2HEX(bytes[5])..INT2HEX(bytes[6]).."-"..
-         INT2HEX(bytes[7])..INT2HEX(bytes[8]).."-"..
-         INT2HEX(bytes[9])..INT2HEX(bytes[10]).."-"..
+  return  INT2HEX(bytes[1])..INT2HEX(bytes[2])..INT2HEX(bytes[3])..INT2HEX(bytes[4])..
+         INT2HEX(bytes[5])..INT2HEX(bytes[6])..
+         INT2HEX(bytes[7])..INT2HEX(bytes[8])..
+         INT2HEX(bytes[9])..INT2HEX(bytes[10])..
          INT2HEX(bytes[11])..INT2HEX(bytes[12])..INT2HEX(bytes[13])..INT2HEX(bytes[14])..INT2HEX(bytes[15])..INT2HEX(bytes[16])
 end
 

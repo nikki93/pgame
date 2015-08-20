@@ -9,6 +9,7 @@ function love.load(arg)
   require('socket') -- for uuid
   uuid = require('lib.uuid')
   uuid.seed()
+  md5 = require('lib.md5')
   require('lib.scratch')
   require('lib.method')
   require('lib.bootstrap')

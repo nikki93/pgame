@@ -82,7 +82,7 @@ function bootstrap.entity()
   bootstrap.require('universe')
 
   -- our first entity! this is will be an rproto for all entities
-  entity._name_entity('entity', entity._create())
+  entity._name_entity('entity', entity._create('entity'))
 end
 
 
@@ -198,9 +198,10 @@ function entity._link(sub, proto, s, p)
 end
 
 -- create and return new entity with new unique id and no protos -- you really
--- should just use entity.create which ensures 'entity' is an rproto
-function entity._create()
-  local id = uuid()
+-- should just use entity.create which ensures 'entity' is an rproto -- if
+-- seed is given, it is used to deterministically generate a unique id
+function entity._create(seed)
+  local id = seed and md5.sumhexa(seed) or uuid()
   -- create and return entity
   local e = {
     id = id,
@@ -283,9 +284,11 @@ function entity.create(protos)
   return entity.create_named(nil, protos)
 end
 
--- create an entity with given name and array of entities as protos
-function entity.create_named(name, protos)
-  local e = entity._create()
+-- create an entity with given name and array of entities as protos -- also
+-- optionally takes a seed to seed the id generator, useful if you're replacing
+-- an old object with a new name
+function entity.create_named(name, protos, seed)
+  local e = entity._create(seed or name)
   if protos then
     for _, proto in ipairs(protos) do entity._link(e.id, proto.id, e) end
   end
