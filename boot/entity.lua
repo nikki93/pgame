@@ -344,80 +344,37 @@ end
 
 -- save entities to a image -- ents must be an array of entities
 function entity.save(ents)
-  -- sort array
+  -- pre-sort array for stability
   local sorted = {}
   for _, ent in ipairs(ents) do table.insert(sorted, ent) end
   table.sort(sorted, function (e, f) return e.id < f.id end)
 
-  -- skip saving of slots starting with _
-  return serpent.dump(sorted, { indent = ' ', sortkeys = true })
+  -- put into a new array with protos before subs, restricted to input array
+  local ids = {}
+  for _, ent in ipairs(sorted) do ids[ent.id] = true end
+  local ord, vis = {}, {}
+  local function visit(e)
+    if vis[e] then return end
+    vis[e] = true
+    for _, proto_id in ipairs(rawget(e, 'proto_ids')) do
+      if ids[proto_id] then visit(entity.get(proto_id)) end
+    end
+    table.insert(ord, e)
+  end
+  for _, ent in ipairs(sorted) do visit(ent) end
+
+  -- serialize and return
+  return serpent.dump(ord, { indent = ' ', sortkeys = true })
 end
 
--- load entities from an image -- returns the array of entities as passed to
--- entity.save(...) to save the image
+-- load entities from an image -- returns the array of entities loaded
 function entity.load(buf)
   local success, ents = serpent.load(buf)
   if not success then
     print('loading image failed: ')
     print(tostring(ents))
   end
-
-  -- first pass: loaded entities might drop protos, clean up _sub_id cache
-  for _, ent in ipairs(ents) do
-    local old = entity._ids[ent.id]
-    if old then
-      local ps = rawget(ent, 'proto_ids')
-      for _, old_proto_id in ipairs(rawget(old, 'proto_ids')) do
-        local found = false
-        for _, proto_id in ipairs(ps) do
-          if old_proto_id == proto_id then
-            found = true
-            break
-          end
-        end
-        if not found then
-          rawget(entity.get(old_proto_id), '_sub_ids')[old.id] = nil
-        end
-      end
-    end
-  end
-
-  -- second pass: copy or initialize caches, set metatable and put in id table
-  for _, ent in ipairs(ents) do
-    local old = entity._ids[ent.id]
-    rawset(ent, '_sub_ids', old and rawget(old, '_sub_ids') or {})
-    rawset(ent, '_method_entries', {})
-    setmetatable(ent, entity.meta)
-    entity._ids[ent.id] = ent
-  end
-
-  -- third pass: add to _sub_ids list of new protos or warn about dangling ones
-  local warn = {}
-  for _, ent in ipairs(ents) do
-    local pp = rawget(ent, 'proto_ids')
-    for i = #pp, 1, -1 do
-      local p = entity._ids[pp[i]]
-      if p then 
-        rawget(p, '_sub_ids')[ent.id] = true
-      else
-        warn[pp[i]] = true
-        table.remove(pp, i)
-      end
-    end
-  end
-  for id in pairs(warn) do
-    print("warning: couldn't find proto with id '"
-            .. tostring(id) .. "', ignored")
-  end
-
-  -- fourth pass: associate with names -- this installs the methods too
-  for _, ent in ipairs(ents) do
-    local name = rawget(ent, 'name')
-    if name then entity._name_entity(name, ent) end
-  end
-
-  entity._proto_order_cache = {}
-  return ents
+  return entity.adds(ents)
 end
 
 -- save bunch of entities to a file image, ents specified as in entity.save(...)
@@ -427,8 +384,7 @@ function entity.save_file(filename, ents)
   f:close()
 end
 
--- load entities from a file image -- returns the array of entities as passed to
--- entity.save_file(...) to save to the file
+-- load entities from a file image -- returns the array of entities loaded
 function entity.load_file(filename)
   local f = love.filesystem.newFile(filename)
   f:open('r')
