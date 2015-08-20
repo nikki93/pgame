@@ -329,6 +329,14 @@ function entity.add(ent)
   return ent
 end
 
+-- add many entities from many entity description tables -- just runs entity.add
+-- on each and returns them all
+function entity.adds(ts)
+  for _, t in ipairs(ts) do entity.add(t) end
+  return ts
+end
+
+
 -- save/load -------------------------------------------------------------------
 
 -- save entities to a image -- ents must be an array of entities
