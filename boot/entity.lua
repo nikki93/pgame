@@ -102,17 +102,12 @@ end
 function entity._name_entity(name, ent)
   -- update entities[...] map
   local old_name = rawget(ent, 'name')
-  if old_name ~= nil and old_name ~= name then
-    entities[old_name] = nil -- has an old name
-  end
+  if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
   rawset(ent, 'name', name)
   if name ~= nil then entities[name] = ent end
 
   -- associate methods
-  local method_table = methods[name]
-  if method_table then
-    rawset(ent, '_method_entries', rawget(method_table, '_entries'))
-  end
+  rawset(ent, '_method_entries', rawget(methods[name], '_entries'))
 end
 
 

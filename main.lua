@@ -22,8 +22,6 @@ function love.load(arg)
     assert(arg[2], 'no image file specified...')
     bootstrap.boot(arg[2])
     love.event.push('quit')
-    table.remove(arg, 1)
-    table.remove(arg, 1)
     return
   elseif arg[1] == '--boot' then -- read from file
     assert(arg[2], 'no image file specified...')
