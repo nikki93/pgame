@@ -1,46 +1,45 @@
 do local _={
  {
-  id="3ac340832f29c115",
+  id="f5e638cc78dd325906c12",
+  name="entity",
+  proto_ids={}
+ },
+ {
+  id="3ac340832f29c11538fbe",
   name="update",
   proto_ids={
-   "f5e638cc78dd3259"
+   "f5e638cc78dd325906c12"
   },
-  skip_next_frame=false,
   updating=false
  },
  {
   drawing=true,
-  id="7bd3d5f5b3cdb13a",
+  id="7bd3d5f5b3cdb13aed632",
   name="alive",
   proto_ids={
-   "f5e638cc78dd3259"
+   "f5e638cc78dd325906c12"
   },
   updating=true
  },
  {
   drawing=false,
-  id="c571a3227368b17e",
+  id="c571a3227368b17e0ecc3",
   name="drawable",
   proto_ids={
-   "f5e638cc78dd3259"
+   "f5e638cc78dd325906c12"
   }
  },
  {
-  id="d825c53d89d9cacb",
+  id="d825c53d89d9cacb3e034",
   name="transform",
   position={
    10,
    10
   },
   proto_ids={
-   "f5e638cc78dd3259"
+   "f5e638cc78dd325906c12"
   },
   rotation=0
- },
- {
-  id="f5e638cc78dd3259",
-  name="entity",
-  proto_ids={}
  }
 }
 return _
