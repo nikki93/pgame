@@ -183,11 +183,11 @@ function entity._link(sub, proto, s, p)
   p = p or entity.get(proto)
   s = s or entity.get(sub)
 
-  -- add sub to proto's set of sub_ids
-  local ss = rawget(p, 'sub_ids') or {}
+  -- add sub to proto's cache of _sub_ids
+  local ss = rawget(p, '_sub_ids') or {}
   if ss[sub] then return end -- already linked
   ss[sub] = true
-  rawset(p, 'sub_ids', ss)
+  rawset(p, '_sub_ids', ss)
 
   -- add proto to sub's ordered list of proto_ids
   local ps = rawget(s, 'proto_ids') or {}
@@ -205,7 +205,8 @@ function entity._create(seed)
   -- create and return entity
   local e = {
     id = id,
-    proto_ids = {}, sub_ids = {},
+    proto_ids = {},
+    _sub_ids = {},
     _method_entries = {}
   }
   setmetatable(e, entity.meta)
@@ -220,14 +221,14 @@ end
 -- to call cont() (generally at end) while overriding!
 function methods.entity.destroy(self, cont)
   -- remove from subs' list of proto_ids
-  for sub_id in pairs(rawget(self, 'sub_ids')) do
+  for sub_id in pairs(rawget(self, '_sub_ids')) do
     local ps = rawget(entity.get(sub_id), 'proto_ids')
     for i = 1, #ps do if ps[i] == self.id then table.remove(ps, i) end end
   end
 
-  -- remove from protos' sets of sub_ids
+  -- remove from protos' sets of _sub_ids
   for _, proto_id in pairs(rawget(self, 'proto_ids')) do
-    rawget(entity.get(proto_id), 'sub_ids')[self.id] = nil
+    rawget(entity.get(proto_id), '_sub_ids')[self.id] = nil
   end
 
   entity._ids[self.id] = nil
@@ -259,7 +260,7 @@ end
 function methods.entity.rsubs(self, cont)
   local result = {}
   local function collect(e)
-    for sub_id, _ in pairs(rawget(e, 'sub_ids') or {}) do
+    for sub_id, _ in pairs(rawget(e, '_sub_ids') or {}) do
       local e = entity.get(sub_id)
       if not result[e] then
         result[e] = true
@@ -304,8 +305,8 @@ end
 
 -- save entities to a image -- ents must be an array of entities
 function entity.save(ents)
-  -- save everything except method entries (they're reloaded on load by name)
-  local keyallow = setmetatable({ _method_entries = false },
+  -- skip saving of caches
+  local keyallow = setmetatable({ _method_entries = false, _sub_ids = false },
     { __index = function () return true end })
   return serpent.dump(ents, { keyallow = keyallow })
 end
@@ -319,7 +320,7 @@ function entity.load(buf)
     print(tostring(ents))
   end
 
-  -- first pass: loaded entities might drop protos, clean up sub references
+  -- first pass: loaded entities might drop protos, clean up _sub_id cache
   for _, ent in ipairs(ents) do
     local old = entity._ids[ent.id]
     if old then
@@ -333,51 +334,30 @@ function entity.load(buf)
           end
         end
         if not found then
-          rawget(entity.get(old_proto_id), 'sub_ids')[old.id] = nil
+          rawget(entity.get(old_proto_id), '_sub_ids')[old.id] = nil
         end
       end
     end
   end
 
-  -- second pass: loaded entities might adopt new protos
-  for _, ent in ipairs(ents) do
-    for _, proto_id in ipairs(rawget(ent, 'proto_ids')) do
-      local p = entity._ids[proto_id]
-      if p then rawget(p, 'sub_ids')[ent.id] = true end
-    end
-  end
-
-  -- second pass: loaded entities might have to adopt existing entities as subs
+  -- second pass: copy or initialize caches, set metatable and put in id table
   for _, ent in ipairs(ents) do
     local old = entity._ids[ent.id]
-    if old then
-      local ss = rawget(ent, 'sub_ids')
-      for sub_id in pairs(rawget(old, 'sub_ids')) do
-        ss[sub_id] = true
-      end
-    end
-  end
-
-  -- fourth pass: initialize method cache, metatable and add to entity._ids[...]
-  for _, ent in ipairs(ents) do
+    rawset(ent, '_sub_ids', old and rawget(old, '_sub_ids') or {})
     rawset(ent, '_method_entries', {})
     setmetatable(ent, entity.meta)
     entity._ids[ent.id] = ent
   end
 
-  -- fifth pass: after loading, fix dangling sub/proto references
+  -- third pass: add to _sub_ids list of new protos or warn about dangling ones
   local warn = {}
   for _, ent in ipairs(ents) do
-    local bad_ids = {}
-    local ss = rawget(ent, 'sub_ids')
-    for sub_id in pairs(ss) do
-      if not entity._ids[sub_id] then bad_ids[sub_id] = true end
-    end
-    for bad_id in pairs(bad_ids) do ss[bad_id] = nil end
-
     local pp = rawget(ent, 'proto_ids')
     for i = #pp, 1, -1 do
-      if not entity._ids[pp[i]] then
+      local p = entity._ids[pp[i]]
+      if p then 
+        rawget(p, '_sub_ids')[ent.id] = true
+      else
         warn[pp[i]] = true
         table.remove(pp, i)
       end
@@ -388,7 +368,7 @@ function entity.load(buf)
             .. tostring(id) .. "', ignored")
   end
 
-  -- finally, associate with names -- this installs the methods too
+  -- fourth pass: associate with names -- this installs the methods too
   for _, ent in ipairs(ents) do
     local name = rawget(ent, 'name')
     if name then entity._name_entity(name, ent) end
