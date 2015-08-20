@@ -60,12 +60,33 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- namespace for all entity meta stuff
 entity = {}
 
--- this table stores all entities that exist, so that entity._ids[o.id] == o,
--- where o is an entity
-entity._ids = {}
+
+-- bootstrap -------------------------------------------------------------------
+
+function bootstrap.universe()
+  -- this table stores all entities that exist, so that entity._ids[o.id] == o,
+  -- where o is an entity
+  entity._ids = {}
+
+  -- this table refers to entities by name, so that entities[o.name] == o, where
+  -- o is an entity with a name
+  entities = {}
+
+  -- list of entities to destroy on next cleanup
+  entity._destroy_marks = { ord = {}, ids = {} }
+end
+
+function bootstrap.entity()
+  bootstrap.require('universe')
+
+  -- our first entity! this is will be an rproto for all entities
+  entity._name_entity('entity', entity._create())
+end
+
+
+-- ids/names -------------------------------------------------------------------
 
 -- same as entity._ids[id], but error if not present
 function entity.get(id)
@@ -76,57 +97,6 @@ function entity.get(id)
   end
   return e
 end
-
-
--- names/methods ---------------------------------------------------------------
-
--- get the method structure for method named m on entity e
-function entity._get_method(e, m)
-  return rawget(e, '_method_entries')[m]
-end
-
--- methods is a table that can be used to associate names with methods by
--- setting methods.name.methodname, or to remove associations by setting
--- methods.name or methods.name.methodname to nil
-
-entity._method_table_meta = {
-  __newindex = function (o, k, v)
-    -- need a call-next-method continuation -- the continuation is a closure
-    -- that iterates through the proto order, the entrypoint is a wrapper that
-    -- starts off the chain
-    local function entrypoint(self, ...)
-      local ord = entity._proto_order(self)
-      local i = #ord + 1
-      local function cont(...)
-        while true do
-          i = i - 1
-          if i < 1 then return nil end
-          local pm = entity._get_method(ord[i], k)
-          if pm then return pm.func(self, cont, ...) end
-        end
-      end
-      return cont(...)
-    end
-    rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v }
-  end,
-
-  __index = function (o, k)
-    return rawget(o, '_entries')[k]
-  end
-}
-
-entity._methods_meta = {
-  __index = function (o, k)
-    local v = setmetatable({ _entries = {} }, entity._method_table_meta)
-    rawset(o, k, v)
-    return v
-  end
-}
-
-methods = setmetatable({}, entity._methods_meta)
-
--- entities by name
-entities = {}
 
 -- associate a name with an entity -- can use nil name to remove name
 function entity._name_entity(name, ent)
@@ -139,7 +109,7 @@ function entity._name_entity(name, ent)
   if name ~= nil then entities[name] = ent end
 
   -- associate methods
-  local method_table = rawget(methods, name)
+  local method_table = methods[name]
   if method_table then
     rawset(ent, '_method_entries', rawget(method_table, '_entries'))
   end
@@ -158,7 +128,7 @@ entity.meta = {
     if r ~= nil then return r end
 
     -- check for method
-    r = entity._get_method(o, k)
+    r = method._get_method(o, k)
     if r ~= nil then return r.entrypoint end
 
     -- check recursively in each proto
@@ -189,6 +159,8 @@ entity.meta = {
 -- entities appear after all their protos and ties are broken in right-left
 -- order of proto_ids list
 function entity._proto_order(e)
+  local cache = entity._proto_order_cache[e]
+  if cache then return cache end
   local ord, vis = {}, {}
   local function visit(e)
     if vis[e] then return end
@@ -201,6 +173,7 @@ function entity._proto_order(e)
     table.insert(ord, e)
   end
   visit(e)
+  entity._proto_order_cache[e] = ord
   return ord
 end
 
@@ -220,6 +193,8 @@ function entity._link(sub, proto, s, p)
   local ps = rawget(s, 'proto_ids') or {}
   table.insert(ps, proto)
   rawset(s, 'proto_ids', ps)
+
+  entity._proto_order_cache = {}
 end
 
 -- create and return new entity with new unique id and no protos -- you really
@@ -238,11 +213,7 @@ function entity._create()
 end
 
 
--- 'entity' entity -------------------------------------------------------------
-
-function bootstrap.entity()
-  entity._name_entity('entity', entity._create())
-end
+-- base entity methods ---------------------------------------------------------
 
 -- immediately forget an entity and disconnect its sub/proto links -- remember
 -- to call cont() (generally at end) while overriding!
@@ -260,10 +231,11 @@ function methods.entity.destroy(self, cont)
 
   entity._ids[self.id] = nil
   if self.name then entities[self.name] = nil end
+
+  entity._proto_order_cache = {}
 end
 
 -- mark an entity to be destroyed on the next entities.entity:cleanup() call
-entity._destroy_marks = { ord = {}, ids = {} }
 function methods.entity.mark_destroy(self, cont)
   if not entity._destroy_marks.ids[self.id] then
     table.insert(entity._destroy_marks.ord, self.id)
@@ -335,7 +307,7 @@ function entity.save(ents)
   return serpent.dump(ents, { keyallow = keyallow })
 end
 
--- load entities from a image -- returns the array of entities as passed to
+-- load entities from an image -- returns the array of entities as passed to
 -- entity.save(...) to save the image
 function entity.load(buf)
   local success, ents = serpent.load(buf)
@@ -419,6 +391,7 @@ function entity.load(buf)
     if name then entity._name_entity(name, ent) end
   end
 
+  entity._proto_order_cache = {}
   return ents
 end
 

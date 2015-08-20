@@ -1,34 +1,34 @@
 -- main events -----------------------------------------------------------------
 
-function love.load()
+function love.load(arg)
   love.window.setMode(800, 600, { x = 629, y = 56 })
 
   -- libraries
-  serpent = require('serpent')
-  dbg = require('debugger')
+  serpent = require('lib.serpent')
+  dbg = require('lib.debugger')
   require('socket') -- for uuid
-  uuid = require('uuid')
+  uuid = require('lib.uuid')
   uuid.seed()
+  require('lib.scratch')
+  require('lib.method')
+  require('lib.bootstrap')
 
-  -- bootstrap
-  require('scratch')
-  require('bootstrap')
-
-  -- basic entities
-  require('entity')
-  require('update')
-  require('drawable')
-  require('alive')
-  require('scratch')
-  require('transform')
-
-  -- test entities
-  require('test')
+  -- boot!
+  bootstrap.load_methods()
+  if arg[2] == '--bootstrap' then
+    bootstrap.boot(arg[3])
+  elseif arg[2] then
+    bootstrap._visit('universe') -- need some basics to even start loading...
+    entity.load_file(arg[2])
+  else
+    error('no boot image specified!')
+  end
 end
 
 function love.update(dt)
   scratch.update()
   if entities.update then entities.update:update_rsubs(dt) end
+  if entities.entity then entities.entity:cleanup() end
 end
 
 function love.draw()

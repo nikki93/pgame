@@ -1,11 +1,9 @@
 -- rotator
 
-function bootstrap.rotator()
-  entity.create_named('rotator', { entities.update,
-                                   entities.transform })
+entity.create_named('rotator', { entities.update,
+                                 entities.transform })
 
-  entities.rotator.rotation_speed = 30
-end
+entities.rotator.rotation_speed = 30
 
 function methods.rotator.update(self, cont, dt)
   cont(dt)
@@ -15,14 +13,12 @@ end
 
 -- player
 
-function bootstrap.player()
-  entity.create_named('player', { entities.drawable,
-                                  entities.update,
-                                  entities.transform })
+entity.create_named('player', { entities.drawable,
+                                entities.update,
+                                entities.transform })
 
-  entities.player.dir = 1
-  entities.player.position = { 10, 200 }
-end
+entities.player.dir = 1
+entities.player.position = { 10, 200 }
 
 function methods.player.update(self, cont, dt)
   cont(dt)
@@ -45,9 +41,7 @@ end
 
 -- scene
 
-function test_scene()
-  the_player = entity.create({ entities.alive,
-                               entities.player,
-                               entities.rotator })
-end
+the_player = entity.create({ entities.alive,
+                             entities.player,
+                             entities.rotator })
 
