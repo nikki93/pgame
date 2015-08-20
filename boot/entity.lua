@@ -202,7 +202,7 @@ end
 -- seed is given, it is used to deterministically generate a unique id
 function entity._create(seed)
   local id = seed and md5.sumhexa(seed) or uuid()
-  id = id:sub(-8)
+  id = id:sub(1, 16)
   -- create and return entity
   local e = {
     id = id,
