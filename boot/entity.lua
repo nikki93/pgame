@@ -242,23 +242,15 @@ end
 
 -- entity creation utilities ---------------------------------------------------
 
--- associate a name with an entity -- can use nil name to remove name
-function entity._name_entity(name, ent)
-  -- update entities[...] map
-  local old_name = rawget(ent, 'name')
-  if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
-  rawset(ent, 'name', name)
-  if name ~= nil then entities[name] = ent end
-
-  -- associate methods
-  rawset(ent, '_method_entries', rawget(methods[name], '_entries'))
-end
-
--- add an entity from a table used to describe it -- the table resembles the
--- entity table itself (thus listing properties etc.), but can have a 'protos'
--- list overriding 'proto_ids,' directly refering to the proto entities or
--- referring to them by name for convenience -- this modifies the table into the
--- entity -- if an id is given, replaces entity of same id
+-- add an entity from an 'entity description table'
+--
+-- an entity description table is identical in layout to the entity itself, but
+-- can optionally have a 'protos' list instead of 'proto_ids,' directly refering
+-- to the proto entities or referring to them by name for convenience
+--
+-- this function modifies the parameter into the resulting entity
+--
+-- replaces the existing with the same name or id if exists
 function entity.add(ent)
   setmetatable(ent, nil) -- no fancy stuff, start from a plain table
 
