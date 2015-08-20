@@ -2,7 +2,6 @@
 
 function love.load(arg)
   table.remove(arg, 1)
-  love.window.setMode(800, 600, { x = 629, y = 56 })
 
   -- libraries
   serpent = require('lib.serpent')
