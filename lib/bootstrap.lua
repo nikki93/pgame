@@ -23,13 +23,6 @@ function bootstrap.require(...)
   end
 end
 
--- load entity methods defined in 'boot/'
-function bootstrap.load_methods()
-  for _, file in ipairs(love.filesystem.getDirectoryItems('boot')) do
-    dofile('boot/' .. file)
-  end
-end
-
 -- reboot the system, and if filename is given, immediately save image to file
 -- warning: destroys all existing entities!
 function bootstrap.boot(filename)

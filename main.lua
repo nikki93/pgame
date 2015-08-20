@@ -1,6 +1,7 @@
 -- main events -----------------------------------------------------------------
 
 function love.load(arg)
+  table.remove(arg, 1)
   love.window.setMode(800, 600, { x = 629, y = 56 })
 
   -- libraries
@@ -15,15 +16,27 @@ function love.load(arg)
   require('lib.bootstrap')
 
   -- boot!
-  bootstrap.load_methods()
-  if arg[2] == '--bootstrap' then
-    bootstrap.boot(arg[3])
-  elseif arg[2] then
-    bootstrap._visit('universe') -- need some basics to even start loading...
-    entity.load_file(arg[2])
-  else
-    error('no boot image specified!')
+  method.load('boot')
+  local boot_image = 'boot/boot.pgame'
+  if arg[1] == '--bootstrap' then -- bootstrap, write to file and quit
+    assert(arg[2], 'no image file specified...')
+    bootstrap.boot(arg[2])
+    love.event.push('quit')
+    table.remove(arg, 1)
+    table.remove(arg, 1)
+    return
+  elseif arg[1] == '--boot' then -- read from file
+    assert(arg[2], 'no image file specified...')
+    boot_image = arg[2]
+    table.remove(arg, 1)
+    table.remove(arg, 1)
   end
+  bootstrap._visit('universe') -- need some basics for entity.load_file(...)
+  entity.load_file(boot_image)
+
+  -- run start script
+  if arg[1] then method.load(arg[1]) end
+  if arg[2] then entity.load_file(arg[2]) end
 end
 
 function love.update(dt)

@@ -1,5 +1,15 @@
 method = {}
 
+-- load methods from a directory
+function method.load(dir)
+  for _, file in ipairs(love.filesystem.getDirectoryItems(dir)) do
+    if string.find(file, "%.lua$") then
+      dofile(dir .. '/' .. file)
+    end
+  end
+end
+
+
 -- get the method structure for method named m on entity e
 function method._get_method(e, m)
   return rawget(e, '_method_entries')[m]
