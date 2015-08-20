@@ -1,10 +1,14 @@
 -- can be visualized
 
-function bootstrap.drawable()
-  entity.add {
-    name = 'drawable',
+function bootstrap:drawable()
+  self:depends('entity')
+  return entity.adds {
+    {
+      name = 'drawable',
+      protos = { 'entity' },
 
-    drawing = false, -- whether to receive draw events
+      drawing = false, -- whether to receive draw events
+    }
   }
 end
 

@@ -1,10 +1,14 @@
 -- updated every frame
 
-function bootstrap.update()
-  entity.add {
-    name = 'update',
+function bootstrap:update()
+  self:depends('entity')
+  return entity.adds {
+    {
+      name = 'update',
+      protos = { 'entity' },
 
-    updating = false, -- whether to receive update events
+      updating = false, -- whether to receive update events
+    }
   }
 end
 

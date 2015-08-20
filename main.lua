@@ -12,14 +12,15 @@ function love.load(arg)
   md5 = require('lib.md5')
   require('lib.scratch')
   require('lib.method')
-  require('lib.bootstrap')
+  require('lib.recipe')
 
-  -- boot!
+  -- boot(strap)!
+  bootstrap = recipe.new('bootstrap')
   method.load('boot')
   local boot_image = 'boot/boot.pgame'
   if arg[1] == '--bootstrap' then -- bootstrap, write to file and quit
     assert(arg[2], 'no image file specified...')
-    bootstrap.boot(arg[2])
+    bootstrap:run(nil, arg[2])
     love.event.push('quit')
     return
   elseif arg[1] == '--boot' then -- read from file
@@ -28,7 +29,7 @@ function love.load(arg)
     table.remove(arg, 1)
     table.remove(arg, 1)
   end
-  bootstrap._visit('universe') -- need some basics for entity.load_file(...)
+  bootstrap:run({ 'universe' }) -- need some basics for entity.load_file(...)
   entity.load_file(boot_image)
 
   -- run start script

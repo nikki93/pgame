@@ -65,7 +65,7 @@ entity = {}
 
 -- bootstrap -------------------------------------------------------------------
 
-function bootstrap.universe()
+function bootstrap:universe()
   -- this table stores all entities that exist, so that entity._ids[o.id] == o,
   -- where o is an entity
   entity._ids = {}
@@ -78,11 +78,11 @@ function bootstrap.universe()
   entity._destroy_marks = { ord = {}, ids = {} }
 end
 
-function bootstrap.entity()
-  bootstrap.require('universe')
+function bootstrap:entity()
+  self:depends('universe')
 
   -- our first entity! this is will be an rproto for all entities
-  entity.add { name = 'entity' }
+  return entity.adds { { name = 'entity' } }
 end
 
 

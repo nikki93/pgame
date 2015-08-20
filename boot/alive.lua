@@ -1,11 +1,15 @@
 -- enables event notification
 
-function bootstrap.alive()
-  entity.add {
-    name = 'alive',
+function bootstrap:alive()
+  self:depends('entity')
+  return entity.adds {
+    {
+      name = 'alive',
+      protos = { 'entity' },
 
-    updating = true,
-    drawing = true,
+      updating = true,
+      drawing = true,
+    }
   }
 end
 
