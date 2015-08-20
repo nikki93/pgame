@@ -270,7 +270,7 @@ function entity.add(ent)
       if type(ref) == 'string' then
         ref = assert(entities[ref], "no entity with name '" .. ref .. "'")
       end
-      table.insert('proto_ids', ref.id)
+      table.insert(ent.proto_ids, ref.id)
     end
   end
   ent.protos = nil
@@ -300,7 +300,10 @@ function entity.add(ent)
   for i = #pp, 1, -1 do
     local p = entity._ids[pp[i]]
     if p then rawget(p, '_sub_ids')[ent.id] = true
-    else print("warning: couldn't find proto with id '" .. pp[i] .. "'") end
+    else
+      print("warning: couldn't find proto with id '" .. pp[i] .. "'")
+      table.remove(pp, i)
+    end
   end
 
   -- subs: copy from old _sub_id cache or initialize
