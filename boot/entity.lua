@@ -137,6 +137,11 @@ entity.meta = {
 
   __tostring = function (o)
     return o:to_string()
+  end,
+
+  -- to skip slots starting with '_' on serialization
+  __keyallow = function (k)
+    return not (type(k) == 'string' and k:sub(1, 1) == '_')
   end
 }
 
@@ -297,11 +302,8 @@ function entity.save(ents)
   for _, ent in ipairs(ents) do table.insert(sorted, ent) end
   table.sort(sorted, function (e, f) return e.id < f.id end)
 
-  -- skip saving of caches
-  local keyallow = setmetatable({ _method_entries = false, _sub_ids = false },
-    { __index = function () return true end })
-  return serpent.dump(sorted,
-                      { indent = ' ', sortkeys = true, keyallow = keyallow })
+  -- skip saving of slots starting with _
+  return serpent.dump(sorted, { indent = ' ', sortkeys = true })
 end
 
 -- load entities from an image -- returns the array of entities as passed to
