@@ -135,15 +135,6 @@ entity.meta = {
     return nil
   end,
 
-  __newindex = function (o, k, v)
-    if v == nil then
-      -- remove previous method structure if exists
-      rawget(o, '_methods')[k] = nil
-    else
-      rawset(o, k, v)
-    end
-  end,
-
   __tostring = function (o)
     return o:to_string()
   end
