@@ -238,9 +238,9 @@ function methods.entity.cleanup(self, cont)
   entity._destroy_marks = { ord = {}, ids = {} }
 end
 
--- add entity with id proto_id as a proto
-function methods.entity.add_proto_id(self, cont, proto_id)
-  entity._link(self.id, proto_id, self)
+-- add entity as a proto
+function methods.entity.add_proto(self, cont, proto)
+  entity._link(self.id, proto.id, self, proto)
 end
 
 -- return all subs, recursively, as a set
