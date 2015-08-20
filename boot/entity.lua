@@ -306,10 +306,16 @@ end
 
 -- save entities to a image -- ents must be an array of entities
 function entity.save(ents)
+  -- sort array
+  local sorted = {}
+  for _, ent in ipairs(ents) do table.insert(sorted, ent) end
+  table.sort(sorted, function (e, f) return e.id < f.id end)
+
   -- skip saving of caches
   local keyallow = setmetatable({ _method_entries = false, _sub_ids = false },
     { __index = function () return true end })
-  return serpent.dump(ents, { indent = ' ', keyallow = keyallow })
+  return serpent.dump(sorted,
+                      { indent = ' ', sortkeys = true, keyallow = keyallow })
 end
 
 -- load entities from an image -- returns the array of entities as passed to
