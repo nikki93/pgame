@@ -36,8 +36,14 @@ function love.load(arg)
   if arg[2] then entity.load_file(arg[2]) end
 end
 
+main_skip_next_frame = false -- to avoid dt spikes
 function love.update(dt)
-  scratch.update()
+  scratch.update() -- don't skip scratch updates
+  if main_skip_next_frame then
+    main_skip_next_frame = false
+    return
+  end
+
   if entities.update then entities.update:update_rsubs(dt) end
   if entities.entity then entities.entity:cleanup() end
 end
@@ -54,7 +60,7 @@ local function safe_call(f)
   local succ, err = dbg.call(f)
   if not succ then
     -- avoid dt spike by skipping next frame
-    entities.update.skip_next_frame = true
+    main_skip_next_frame = true
   end
 end
 
