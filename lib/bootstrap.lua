@@ -39,6 +39,13 @@ function bootstrap.boot(filename)
     bootstrap._visit(name)
   end
   print('done!')
+
+  if filename then
+    print("saving to '" .. filename .. "'")
+    local all_ents = {}
+    for _, ent in pairs(entity._ids) do table.insert(all_ents, ent) end
+    entity.save_file(filename, all_ents)
+  end
 end
 
 -- allows adding functions using function bootstrap.stepname() ... end
