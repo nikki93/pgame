@@ -1,9 +1,11 @@
 -- can be visualized
 
 function bootstrap.drawable()
-  entity.create_named('drawable')
+  entity.add {
+    name = 'drawable',
 
-  entities.drawable.drawing = false -- whether to receive draw events
+    drawing = false, -- whether to receive draw events
+  }
 end
 
 function methods.drawable.draw(self, cont) cont() end

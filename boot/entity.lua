@@ -82,7 +82,7 @@ function bootstrap.entity()
   bootstrap.require('universe')
 
   -- our first entity! this is will be an rproto for all entities
-  entity._name_entity('entity', entity._create('entity'))
+  entity.add { name = 'entity' }
 end
 
 
@@ -96,18 +96,6 @@ function entity.get(id)
     error ("no entity with id '" .. tostring(id) .. "'")
   end
   return e
-end
-
--- associate a name with an entity -- can use nil name to remove name
-function entity._name_entity(name, ent)
-  -- update entities[...] map
-  local old_name = rawget(ent, 'name')
-  if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
-  rawset(ent, 'name', name)
-  if name ~= nil then entities[name] = ent end
-
-  -- associate methods
-  rawset(ent, '_method_entries', rawget(methods[name], '_entries'))
 end
 
 
@@ -188,24 +176,6 @@ function entity._link(sub, proto, s, p)
   entity._proto_order_cache = {}
 end
 
--- create and return new entity with new unique id and no protos -- you really
--- should just use entity.create which ensures 'entity' is an rproto -- if
--- seed is given, it is used to deterministically generate a unique id
-function entity._create(seed)
-  local id = seed and md5.sumhexa(seed) or uuid()
-  id = id:sub(1, 16)
-  -- create and return entity
-  local e = {
-    id = id,
-    proto_ids = {},
-    _sub_ids = {},
-    _method_entries = {}
-  }
-  setmetatable(e, entity.meta)
-  entity._ids[id] = e
-  return e
-end
-
 
 -- base entity methods ---------------------------------------------------------
 
@@ -272,26 +242,100 @@ end
 
 -- entity creation utilities ---------------------------------------------------
 
--- create an entity with given array of entities as protos
-function entity.create(protos)
-  return entity.create_named(nil, protos)
+-- associate a name with an entity -- can use nil name to remove name
+function entity._name_entity(name, ent)
+  -- update entities[...] map
+  local old_name = rawget(ent, 'name')
+  if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
+  rawset(ent, 'name', name)
+  if name ~= nil then entities[name] = ent end
+
+  -- associate methods
+  rawset(ent, '_method_entries', rawget(methods[name], '_entries'))
 end
 
--- create an entity with given name and array of entities as protos -- also
--- optionally takes a seed to seed the id generator, useful if you're replacing
--- an old object with a new name
-function entity.create_named(name, protos, seed)
-  local e = entity._create(seed or name)
-  if protos then
-    for _, proto in ipairs(protos) do entity._link(e.id, proto.id, e) end
-  end
-  if #rawget(e, 'proto_ids') == 0 then
-    entity._link(e.id, entities.entity.id, e)
-  end
-  if name then entity._name_entity(name, e) end
-  return e
-end
+-- add an entity from a table used to describe it -- the table resembles the
+-- entity table itself (thus listing properties etc.), but can have a 'protos'
+-- list overriding 'proto_ids,' directly refering to the proto entities or
+-- referring to them by name for convenience -- this modifies the table into the
+-- entity -- if an id is given, replaces entity of same id
+function entity.add(ent)
+  setmetatable(ent, nil) -- no fancy stuff, start from a plain table
 
+  -- generate id -- hash of name or seed, new uuid if neither
+  if not ent.id then
+    local seed = ent.name or ent.id_seed
+    ent.id = (seed and md5.sumhexa(seed) or uuid()):sub(1, 21)
+  end
+  ent.id_seed = nil
+  local old = entity._ids[ent.id]
+
+  -- initialize 'proto_ids' and convert from 'protos' list
+  if not ent.proto_ids then ent.proto_ids = {} end
+  if ent.protos then
+    ent.proto_ids = {}
+    for _, ref in ipairs(ent.protos) do
+      if type(ref) == 'string' then
+        ref = assert(entities[ref], "no entity with name '" .. ref .. "'")
+      end
+      table.insert('proto_ids', ref.id)
+    end
+  end
+  ent.protos = nil
+  if ent.name ~= 'entity' and next(ent.proto_ids) == nil then
+    table.insert(ent.proto_ids, entities.entity.id) -- ensure root proto entity
+  end
+
+  -- dropping old protos: unset in their _sub_id caches
+  if old then
+    local ps = ent.proto_ids
+    for _, old_proto_id in ipairs(rawget(old, 'proto_ids')) do
+      local found = false
+      for _, proto_id in ipairs(ps) do
+        if old_proto_id == proto_id then
+          found = true
+          break
+        end
+      end
+      if not found then
+        rawget(entity.get(old_proto_id), '_sub_ids')[old.id] = nil
+      end
+    end
+  end
+
+  -- protos: set in their _sub_id caches
+  local pp = rawget(ent, 'proto_ids')
+  for i = #pp, 1, -1 do
+    local p = entity._ids[pp[i]]
+    if p then rawget(p, '_sub_ids')[ent.id] = true
+    else print("warning: couldn't find proto with id '" .. pp[i] .. "'") end
+  end
+
+  -- subs: copy from old _sub_id cache or initialize
+  rawset(ent, '_sub_ids', old and rawget(old, '_sub_ids') or {})
+
+  -- associate with name and initialize method cache
+  local name = rawget(ent, 'name')
+  if name ~= nil then
+    entities[name] = ent
+    ent._method_entries = rawget(methods[name], '_entries')
+  else
+    ent._method_entries = {}
+  end
+  if old then
+    local old_name = rawget(old, 'name')
+    if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
+  end
+
+  -- finally, set metatable and put in id table
+  setmetatable(ent, entity.meta)
+  entity._ids[ent.id] = ent
+
+  -- reset global proto order cache
+  entity._proto_order_cache = {}
+
+  return ent
+end
 
 -- save/load -------------------------------------------------------------------
 

@@ -1,9 +1,11 @@
 -- enables event notification
 
 function bootstrap.alive()
-  entity.create_named('alive')
+  entity.add {
+    name = 'alive',
 
-  entities.alive.updating = true
-  entities.alive.drawing = true
+    updating = true,
+    drawing = true,
+  }
 end
 

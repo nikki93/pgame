@@ -1,9 +1,11 @@
 -- updated every frame
 
 function bootstrap.update()
-  entity.create_named('update')
+  entity.add {
+    name = 'update',
 
-  entities.update.updating = false -- whether to receive update events
+    updating = false, -- whether to receive update events
+  }
 end
 
 function methods.update.update(self, cont, dt) cont(dt) end

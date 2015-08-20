@@ -1,9 +1,11 @@
 -- has a physical position and rotation
 
 function bootstrap.transform()
-  entity.create_named('transform')
+  entity.add {
+    name = 'transform',
 
-  entities.transform.position = { 10, 10 }
-  entities.transform.rotation = 0
+    position = { 10, 10 },
+    rotation = 0,
+  }
 end
 
