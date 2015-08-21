@@ -70,8 +70,8 @@ function bootstrap:universe()
   -- where o is an entity
   entity._ids = {}
 
-  -- this table refers to entities by name, so that entities[o.name] == o, where
-  -- o is an entity with a name
+  -- this table refers to entities by name, so that entities[o:get_name()] == o,
+  -- where o is an entity with a name
   entities = {}
 
   -- list of entities to destroy on next cleanup
@@ -156,6 +156,11 @@ end
 
 -- base entity methods ---------------------------------------------------------
 
+-- get entity's name -- TODO: set to new name if given
+function methods.entity.get_name(self, cont)
+  return rawget(self, 'name')
+end
+
 -- add a proto
 function methods.entity.add_proto(self, cont, proto, i)
   rawget(proto, '_sub_ids')[self.id] = true
@@ -209,7 +214,8 @@ function methods.entity.destroy(self, cont)
   end
 
   entity._ids[self.id] = nil
-  if self.name then entities[self.name] = nil end
+  local name = self:get_name()
+  if name then entities[name] = nil end
 end
 
 -- mark an entity to be destroyed on the next entities.entity:cleanup() call
@@ -229,7 +235,7 @@ end
 
 -- called on string conversion with tostring(...)
 function methods.entity.to_string(self, cont)
-  return '<ent:' .. (self.name or self.id:sub(1,8)) .. '>'
+  return '<ent:' .. (self:get_name() or self.id) .. '>'
 end
 
 
@@ -303,7 +309,7 @@ function entity.add(ent)
   rawset(ent, '_sub_ids', old and rawget(old, '_sub_ids') or {})
 
   -- associate with name and initialize method cache
-  local name = rawget(ent, 'name')
+  local name = ent.name
   if name ~= nil then
     entities[name] = ent
     ent._method_entries = rawget(methods[name], '_entries')
@@ -311,7 +317,7 @@ function entity.add(ent)
     ent._method_entries = {}
   end
   if old then
-    local old_name = rawget(old, 'name')
+    local old_name = old:get_name()
     if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
   end
 
