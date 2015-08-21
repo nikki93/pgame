@@ -34,7 +34,7 @@ function love.load(arg)
 
   -- run start script
   if arg[1] then method.load(arg[1]) end
-  if arg[2] then entity.load_file(arg[2]) end
+  for i = 2, #arg do entity.load_file(arg[i]) end
 end
 
 main_skip_next_frame = false -- to avoid dt spikes
