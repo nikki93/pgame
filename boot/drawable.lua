@@ -4,8 +4,8 @@ function bootstrap:drawable()
   self:depends('entity')
   return entity.adds {
     {
-      name = 'drawable',
-      protos = { 'entity' },
+      _name = 'drawable',
+      _protos = { 'entity' },
 
       drawing = false, -- whether to receive draw events
     }

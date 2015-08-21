@@ -4,8 +4,8 @@ function bootstrap:alive()
   self:depends('entity')
   return entity.adds {
     {
-      name = 'alive',
-      protos = { 'entity' },
+      _name = 'alive',
+      _protos = { 'entity' },
 
       updating = true,
       drawing = true,

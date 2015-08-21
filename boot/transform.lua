@@ -4,8 +4,8 @@ function bootstrap:transform()
   self:depends('entity')
   return entity.adds {
     {
-      name = 'transform',
-      protos = { 'entity' },
+      _name = 'transform',
+      _protos = { 'entity' },
 
       position = { 10, 10 },
       rotation = 0,

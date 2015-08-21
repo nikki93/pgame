@@ -4,8 +4,8 @@ function bootstrap:update()
   self:depends('entity')
   return entity.adds {
     {
-      name = 'update',
-      protos = { 'entity' },
+      _name = 'update',
+      _protos = { 'entity' },
 
       updating = false, -- whether to receive update events
     }
