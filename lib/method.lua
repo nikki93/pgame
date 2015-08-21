@@ -21,23 +21,28 @@ end
 
 method._method_table_meta = {
   __newindex = function (o, k, v)
-    -- need a call-next-method continuation -- the continuation is a closure
-    -- that iterates through the proto order, the entrypoint is a wrapper that
-    -- starts off the chain
-    local function entrypoint(self, ...)
-      local ord = entity._proto_order(self)
-      local i = #ord + 1
-      local function cont(...)
-        while true do
-          i = i - 1
-          if i < 1 then return nil end
-          local pm = method._get_method(ord[i], k)
-          if pm then return pm.func(self, cont, ...) end
+    if type(v) == 'function' then
+      -- need a call-next-method continuation -- the continuation is a closure
+      -- that iterates through the proto order, the entrypoint is a wrapper that
+      -- starts off the chain
+      local function entrypoint(self, ...)
+        local ord = entity._proto_order(self)
+        local i = #ord + 1
+        local function cont(...)
+          while true do
+            i = i - 1
+            if i < 1 then return nil end
+            local pm = method._get_method(ord[i], k)
+            if pm then return pm.func(self, cont, ...) end
+          end
         end
+        return cont(...)
       end
-      return cont(...)
+      rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v }
+    elseif v == nil then
+      -- remove a method?
+      rawget(o, '_entries')[k] = nil
     end
-    rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v }
   end,
 
   __index = function (o, k)
@@ -47,11 +52,25 @@ method._method_table_meta = {
 
 method._methods_meta = {
   __index = function (o, k)
-    local v = setmetatable({ _entries = {} }, method._method_table_meta)
-    rawset(o, k, v)
+    local entry = o._entries[k]
+    if entry then return entry end
+
+    local entries = {}
+    local v = setmetatable({ _entries = entries }, method._method_table_meta)
+    o._entries[k] = v
+    local ent = entities and entities[k]
+    if ent then rawset(ent, '_method_entries', entries) end
     return v
+  end,
+
+  __newindex = function (o, k, v)
+    if v == nil then
+      local ent = entities[k]
+      if ent then rawset(ent, '_method_entries', {}) end
+    end
+    o._entries[k] = v
   end
 }
 
-methods = setmetatable({}, method._methods_meta)
+methods = setmetatable({ _entries = {} }, method._methods_meta)
 
