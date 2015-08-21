@@ -112,7 +112,8 @@ local function _get_slot(o, k)
   r = rawget(o, '_method_entries')[k]
   if r ~= nil then return r.entrypoint end
 
-  -- check recursively in each proto
+  -- check recursively in each proto if not starting with '_'
+  if k:sub(1, 1) == '_' then return end
   for _, proto in ipairs(rawget(o, 'proto_ids')) do
     r = entity.get(proto)
     r = _get_slot(r, k)
