@@ -161,6 +161,20 @@ function methods.entity.get_name(self, cont)
   return rawget(self, 'name')
 end
 
+-- set entity's name
+function methods.entity.set_name(self, cont, name)
+  local old_name = self:get_name()
+  if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
+
+  self.name = name
+  if name ~= nil then
+    entities[name] = self
+    self._method_entries = rawget(methods[name], '_entries')
+  else
+    self._method_entries = {}
+  end
+end
+
 -- add a proto
 function methods.entity.add_proto(self, cont, proto, i)
   rawget(proto, '_sub_ids')[self.id] = true
