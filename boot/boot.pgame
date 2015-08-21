@@ -1,43 +1,43 @@
 do local _={
  {
-  id="f5e638cc78dd325906c12",
-  name="entity",
-  proto_ids={}
+  _id="f5e638cc78dd325906c12",
+  _name="entity",
+  _proto_ids={}
  },
  {
-  id="3ac340832f29c11538fbe",
-  name="update",
-  proto_ids={
+  _id="3ac340832f29c11538fbe",
+  _name="update",
+  _proto_ids={
    "f5e638cc78dd325906c12"
   },
   updating=false
  },
  {
-  drawing=true,
-  id="7bd3d5f5b3cdb13aed632",
-  name="alive",
-  proto_ids={
+  _id="7bd3d5f5b3cdb13aed632",
+  _name="alive",
+  _proto_ids={
    "f5e638cc78dd325906c12"
   },
+  drawing=true,
   updating=true
  },
  {
-  drawing=false,
-  id="c571a3227368b17e0ecc3",
-  name="drawable",
-  proto_ids={
+  _id="c571a3227368b17e0ecc3",
+  _name="drawable",
+  _proto_ids={
    "f5e638cc78dd325906c12"
-  }
+  },
+  drawing=false
  },
  {
-  id="d825c53d89d9cacb3e034",
-  name="transform",
+  _id="d825c53d89d9cacb3e034",
+  _name="transform",
+  _proto_ids={
+   "f5e638cc78dd325906c12"
+  },
   position={
    10,
    10
-  },
-  proto_ids={
-   "f5e638cc78dd325906c12"
   },
   rotation=0
  }
