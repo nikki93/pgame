@@ -1,7 +1,7 @@
 -- main events -----------------------------------------------------------------
 
 function love.load(arg)
-  table.remove(arg, 1)
+  table.remove(arg, 1) -- remove love directory argument
 
   -- libraries
   serpent = require('lib.serpent')
@@ -14,25 +14,30 @@ function love.load(arg)
   require('lib.method')
   require('lib.recipe')
 
-  -- boot(strap)!
+  -- load boot methods
   bootstrap = recipe.new('bootstrap')
   method.load('boot')
-  local boot_image = 'boot/boot.pgame'
-  if arg[1] == '--bootstrap' then -- bootstrap, write to file and quit
+
+  -- bootstrap entire system? create boot image and exit
+  if arg[1] == '--bootstrap' then
     assert(arg[2], 'no image file specified...')
     bootstrap:run(arg[2])
     love.event.push('quit')
     return
-  elseif arg[1] == '--boot' then -- read from file
+  end
+
+  -- bootstrap universe only, then load boot image
+  bootstrap:run(nil, { 'universe' })
+  local boot_image = 'boot/boot.pgame'
+  if arg[1] == '--boot' then
     assert(arg[2], 'no image file specified...')
     boot_image = arg[2]
     table.remove(arg, 1)
     table.remove(arg, 1)
   end
-  bootstrap:run(nil, { 'universe' })
   entity.load_file(boot_image)
 
-  -- run start script
+  -- load game methods and game images
   if arg[1] then method.load(arg[1]) end
   for i = 2, #arg do entity.load_file(arg[i]) end
 end
