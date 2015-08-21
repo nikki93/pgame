@@ -20,7 +20,7 @@ function love.load(arg)
   local boot_image = 'boot/boot.pgame'
   if arg[1] == '--bootstrap' then -- bootstrap, write to file and quit
     assert(arg[2], 'no image file specified...')
-    bootstrap:run(nil, arg[2])
+    bootstrap:run(arg[2])
     love.event.push('quit')
     return
   elseif arg[1] == '--boot' then -- read from file
@@ -29,7 +29,7 @@ function love.load(arg)
     table.remove(arg, 1)
     table.remove(arg, 1)
   end
-  bootstrap:run({ 'universe' }) -- need some basics for entity.load_file(...)
+  bootstrap:run(nil, { 'universe' })
   entity.load_file(boot_image)
 
   -- run start script
