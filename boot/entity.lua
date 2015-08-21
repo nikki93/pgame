@@ -353,9 +353,26 @@ function entity.add(ent)
     if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
   end
 
-  -- finally, set metatable and put in id table
+  -- set metatable and put in id table
   setmetatable(ent, entity.meta)
   entity._ids[ent._id] = ent
+
+  -- take out properties with setters
+  local setters = {}
+  for k, v in pairs(ent) do
+    local setter = ent['set_' .. k]
+    if type(setter) == 'function' then
+        setters[setter] = v
+        ent[k] = nil
+    end
+  end
+
+  -- TODO: call 'added' event over here
+
+  -- call setters after added event
+  for setter, v in pairs(setters) do
+    setter(ent, v)
+  end
 
   return ent
 end
