@@ -1,9 +1,17 @@
+test_protos = recipe.new('test_protos')
+
 -- rotator
 
-entity.create_named('rotator', { entities.update,
-                                 entities.transform })
+function test_protos:rotator()
+  return entity.adds {
+    {
+      name = 'rotator',
+      protos = { 'update', 'transform' },
 
-entities.rotator.rotation_speed = 30
+      rotation_speed = 30,
+    }
+  }
+end
 
 function methods.rotator.update(self, cont, dt)
   cont(dt)
@@ -13,12 +21,17 @@ end
 
 -- player
 
-entity.create_named('player', { entities.drawable,
-                                entities.update,
-                                entities.transform })
-
-entities.player.dir = 1
-entities.player.position = { 10, 200 }
+function test_protos:player()
+  return entity.adds {
+    {
+      name = 'player',
+      protos = { 'drawable', 'update', 'transform' },
+      
+      dir = 1,
+      position = { 10, 200 },
+    }
+  }
+end
 
 function methods.player.update(self, cont, dt)
   cont(dt)
@@ -41,7 +54,12 @@ end
 
 -- scene
 
-the_player = entity.create({ entities.alive,
-                             entities.player,
-                             entities.rotator })
+test_scene = recipe.new('test_scene')
+
+function test_scene:main()
+  return entity.adds {
+    { protos = { 'alive', 'player', 'rotator' } }
+  }
+end
+
 
