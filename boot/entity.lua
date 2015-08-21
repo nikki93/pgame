@@ -101,26 +101,43 @@ end
 
 -- sub/proto logic -------------------------------------------------------------
 
+local function _get_slot(o, k)
+  local r
+
+  -- check in o
+  r = rawget(o, k)
+  if r ~= nil then return r end
+
+  -- check for method
+  r = rawget(o, '_method_entries')[k]
+  if r ~= nil then return r.entrypoint end
+
+  -- check recursively in each proto
+  for _, proto in ipairs(rawget(o, 'proto_ids')) do
+    r = entity.get(proto)
+    r = _get_slot(r, k)
+    if r then return r end
+  end
+  return nil
+end
+
 -- metatable of all entities
 entity.meta = {
   __index = function (o, k)
-    local r
+    local r = _get_slot(o, k)
+    if r then return r end
 
-    -- check in o
-    r = rawget(o, k)
-    if r ~= nil then return r end
+    -- try getter
+    r = _get_slot(o, 'get_' .. k)
+    if r ~= nil then return r(o) end
+  end,
 
-    -- check for method
-    r = method._get_method(o, k)
-    if r ~= nil then return r.entrypoint end
+  __newindex = function (o, k, v)
+    -- check for setter
+    local s = o['set_' .. k]
+    if s ~= nil then return s(o, v) end
 
-    -- check recursively in each proto
-    for _, proto in ipairs(rawget(o, 'proto_ids')) do
-      r = entity.get(proto)
-      r = r[k]
-      if r then return r end
-    end
-    return nil
+    return rawset(o, k, v)
   end,
 
   __tostring = function (o)
