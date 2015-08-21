@@ -138,8 +138,6 @@ entity.meta = {
 -- entities appear after all their protos and ties are broken in right-left
 -- order of proto_ids list
 function entity._proto_order(e)
-  local cache = entity._proto_order_cache[e]
-  if cache then return cache end
   local ord, vis = {}, {}
   local function visit(e)
     if vis[e] then return end
@@ -152,70 +150,31 @@ function entity._proto_order(e)
     table.insert(ord, e)
   end
   visit(e)
-  entity._proto_order_cache[e] = ord
   return ord
-end
-
--- introduce a new sub-proto relationship given the entity ids, and optionally
--- s or p as the entities themselves
-function entity._link(sub, proto, s, p)
-  p = p or entity.get(proto)
-  s = s or entity.get(sub)
-
-  -- add sub to proto's cache of _sub_ids
-  local ss = rawget(p, '_sub_ids') or {}
-  if ss[sub] then return end -- already linked
-  ss[sub] = true
-  rawset(p, '_sub_ids', ss)
-
-  -- add proto to sub's ordered list of proto_ids
-  local ps = rawget(s, 'proto_ids') or {}
-  table.insert(ps, proto)
-  rawset(s, 'proto_ids', ps)
-
-  entity._proto_order_cache = {}
 end
 
 
 -- base entity methods ---------------------------------------------------------
 
--- immediately forget an entity and disconnect its sub/proto links -- remember
--- to call cont() (generally at end) while overriding!
-function methods.entity.destroy(self, cont)
-  -- remove from subs' list of proto_ids
-  for sub_id in pairs(rawget(self, '_sub_ids')) do
-    local ps = rawget(entity.get(sub_id), 'proto_ids')
-    for i = 1, #ps do if ps[i] == self.id then table.remove(ps, i) end end
+-- add a proto
+function methods.entity.add_proto(self, cont, proto, i)
+  rawget(proto, '_sub_ids')[self.id] = true
+  local pp = rawget(self, 'proto_ids')
+  for _, proto_id in ipairs(pp) do
+    if proto.id == proto_id then return end
   end
-
-  -- remove from protos' sets of _sub_ids
-  for _, proto_id in pairs(rawget(self, 'proto_ids')) do
-    rawget(entity.get(proto_id), '_sub_ids')[self.id] = nil
-  end
-
-  entity._ids[self.id] = nil
-  if self.name then entities[self.name] = nil end
-
-  entity._proto_order_cache = {}
+  table.insert(pp, i or #pp + 1, proto.id)
 end
 
--- mark an entity to be destroyed on the next entities.entity:cleanup() call
-function methods.entity.mark_destroy(self, cont)
-  if not entity._destroy_marks.ids[self.id] then
-    table.insert(entity._destroy_marks.ord, self.id)
-    entity._destroy_marks.ids[self.id] = true
+-- remove a proto
+function methods.entity.remove_proto(self, cont, proto)
+  rawget(proto, '_sub_ids')[self.id] = nil
+  local pp = rawget(self, 'proto_ids')
+  for i = 1, #pp do
+    if pp[i] == proto.id then
+      table.remove(pp, i)
+    end
   end
-end
-
--- destroy all entities marked with :mark_destroy() since last cleanup
-function methods.entity.cleanup(self, cont)
-  for _, id in ipairs(entity._destroy_marks.ord) do entity.get(id):destroy() end
-  entity._destroy_marks = { ord = {}, ids = {} }
-end
-
--- add entity as a proto
-function methods.entity.add_proto(self, cont, proto)
-  entity._link(self.id, proto.id, self, proto)
 end
 
 -- return all subs, recursively, as a set
@@ -233,6 +192,40 @@ function methods.entity.rsubs(self, cont)
   collect(self)
   return result
 end
+
+
+-- immediately forget an entity and disconnect its sub/proto links -- remember
+-- to call cont() (generally at end) while overriding!
+function methods.entity.destroy(self, cont)
+  -- remove from subs' list of proto_ids
+  for sub_id in pairs(rawget(self, '_sub_ids')) do
+    local ps = rawget(entity.get(sub_id), 'proto_ids')
+    for i = 1, #ps do if ps[i] == self.id then table.remove(ps, i) end end
+  end
+
+  -- remove from protos' sets of _sub_ids
+  for _, proto_id in pairs(rawget(self, 'proto_ids')) do
+    rawget(entity.get(proto_id), '_sub_ids')[self.id] = nil
+  end
+
+  entity._ids[self.id] = nil
+  if self.name then entities[self.name] = nil end
+end
+
+-- mark an entity to be destroyed on the next entities.entity:cleanup() call
+function methods.entity.mark_destroy(self, cont)
+  if not entity._destroy_marks.ids[self.id] then
+    table.insert(entity._destroy_marks.ord, self.id)
+    entity._destroy_marks.ids[self.id] = true
+  end
+end
+
+-- destroy all entities marked with :mark_destroy() since last cleanup
+function methods.entity.cleanup(self, cont)
+  for _, id in ipairs(entity._destroy_marks.ord) do entity.get(id):destroy() end
+  entity._destroy_marks = { ord = {}, ids = {} }
+end
+
 
 -- called on string conversion with tostring(...)
 function methods.entity.to_string(self, cont)
@@ -325,9 +318,6 @@ function entity.add(ent)
   -- finally, set metatable and put in id table
   setmetatable(ent, entity.meta)
   entity._ids[ent.id] = ent
-
-  -- reset global proto order cache
-  entity._proto_order_cache = {}
 
   return ent
 end
