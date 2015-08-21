@@ -229,7 +229,7 @@ end
 
 -- called on string conversion with tostring(...)
 function methods.entity.to_string(self, cont)
-  return '<entities[' .. tostring(self.id) .. ']>'
+  return '<ent:' .. (self.name or self.id:sub(1,8)) .. '>'
 end
 
 
