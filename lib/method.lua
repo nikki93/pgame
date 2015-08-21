@@ -59,14 +59,14 @@ method._methods_meta = {
     local v = setmetatable({ _entries = entries }, method._method_table_meta)
     o._entries[k] = v
     local ent = entities and entities[k]
-    if ent then rawset(ent, '_method_entries', entries) end
+    if ent then ent._method_entries = entries end
     return v
   end,
 
   __newindex = function (o, k, v)
     if v == nil then
       local ent = entities[k]
-      if ent then rawset(ent, '_method_entries', {}) end
+      if ent then ent._method_entries = {} end
     end
     o._entries[k] = v
   end
