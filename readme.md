@@ -40,6 +40,7 @@ ideas
 + future (philosophy-ish):
     - add slot metadata (docs, inspectability) etc. for ultimate dev experience
     - add vec2 and other basic math
+    - try using coroutines for `cont()` and remove `entity._proto_order()`
 
     - create basic visual sprite entity
         - other basics handled by love
