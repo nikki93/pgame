@@ -82,7 +82,14 @@ function bootstrap:entity()
   self:depends('universe')
 
   -- our first entity! this is will be an rproto for all entities
-  return entity.adds { { _name = 'entity' } }
+  return entity.adds {
+    {
+      _name = 'entity',
+
+      meta__method_entries = { saveload = false },
+      meta__sub_ids = { saveload = false },
+    }
+  }
 end
 
 
@@ -146,8 +153,8 @@ entity.meta = {
   end,
 
   -- to skip slots starting with '_' on serialization
-  __keyallow = function (k)
-    return k ~= '_method_entries' and k ~= '_sub_ids'
+  __keyallow = function (o, k)
+    return o:slot_meta(k, 'saveload') ~= false
   end
 }
 

@@ -2,7 +2,13 @@ do local _={
  {
   _id="f5e638cc78dd325906c12",
   _name="entity",
-  _proto_ids={}
+  _proto_ids={},
+  meta__method_entries={
+   saveload=false
+  },
+  meta__sub_ids={
+   saveload=false
+  }
  },
  {
   _id="3ac340832f29c11538fbe",

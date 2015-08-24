@@ -77,7 +77,7 @@ local function s(t, opts)
         if opts.valignore and opts.valignore[value] -- skip ignored values; do nothing
         or opts.keyallow and not opts.keyallow[key]
         -- MODIFICATION: allow __keyallow function in metatable
-        or (type(mt) == 'table' and mt.__keyallow and not mt.__keyallow(key))
+        or (type(mt) == 'table' and mt.__keyallow and not mt.__keyallow(t, key))
         or opts.valtypeignore and opts.valtypeignore[type(value)] -- skipping ignored value types
         or sparse and value == nil then -- skipping nils; do nothing
         elseif ktype == 'table' or ktype == 'function' or badtype[ktype] then
