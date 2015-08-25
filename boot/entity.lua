@@ -430,7 +430,7 @@ end
 
 -- load entities from an image -- returns the array of entities loaded
 function entity.load(buf)
-  local success, ents = serpent.load(buf)
+  local success, ents = serpent.load(buf, { safe = false })
   if not success then
     print('loading image failed: ')
     print(tostring(ents))
