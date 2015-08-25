@@ -38,10 +38,6 @@ ideas
       human-readable code and image format basically same -- human-machine
 
 + future (philosophy-ish):
-    - add slot metadata (docs, inspectability) etc. for ultimate dev experience
-    - add vec2 and other basic math
-    - try using coroutines for `cont()` and remove `entity._proto_order()`
-
     - create basic visual sprite entity
         - other basics handled by love
         - consider boilerplate requirements cgame had and obsolete them through
@@ -49,6 +45,8 @@ ideas
     - start really early on gui design so that interface evolves with abstract
       idea
     - try to get people to use it
+
+    - try using coroutines for `cont()` and remove `entity._proto_order()`
 
 
 how to play
