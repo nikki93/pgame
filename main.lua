@@ -13,6 +13,7 @@ function love.load(arg)
   require('lib.scratch')
   require('lib.method')
   require('lib.recipe')
+  require('lib.vec2')
 
   -- load boot methods
   bootstrap = recipe.new('bootstrap')
