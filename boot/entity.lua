@@ -281,7 +281,6 @@ end
 -- get the metadata for slot named slotname -- optionally indexing into the
 -- metadata table with name index -- nil if not found
 function methods.entity.slot_meta(self, cont, slotname, index)
-  if slotname == '_method_entries' then dbg() end
   local meta = self['meta_' .. slotname]
   if index then return meta and meta[index] end
   return meta
