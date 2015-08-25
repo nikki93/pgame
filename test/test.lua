@@ -28,7 +28,7 @@ function test_protos:player()
       _protos = { 'drawable', 'update', 'transform' },
       
       dir = 1,
-      position = { 10, 200 },
+      position = vec2(10, 200),
     }
   }
 end
@@ -39,7 +39,7 @@ function methods.player.update(self, cont, dt)
   if self.position[1] > 700 then self.dir = -1 end
   if self.position[1] < 100 then self.dir = 1 end
 
-  self.position = { self.position[1] + self.dir * 200 * dt, self.position[2] }
+  self.position = self.position + 200 * dt * vec2(self.dir, 0)
 end
 
 function methods.player.draw(self, cont)
