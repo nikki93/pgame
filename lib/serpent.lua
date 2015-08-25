@@ -60,6 +60,11 @@ local function s(t, opts)
       seen[t] = insref or spath
       t = mt.__serialize(t)
       ttype = type(t) end -- new value falls through to be serialized
+    if type(mt) == 'table' and mt.__saveload then
+      local f, vs = mt.__saveload(t)
+      for _, v in ipairs(vs) do
+        v = seen[v] or val2str(v,nil,indent,insref,seen[t],plainindex,level+1) end
+      return tag..f..'('..table.concat(vs, ',' .. space)..')' end
     if ttype == "table" then
       if level >= maxl then return tag..'{}'..comment('max', level) end
       seen[t] = insref or spath
