@@ -41,10 +41,7 @@ do local _={
   _proto_ids={
    "f5e638cc78dd325906c12"
   },
-  position={
-   10,
-   10
-  },
+  position=vec2(10,10),
   rotation=0
  }
 }
