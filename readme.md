@@ -8,7 +8,25 @@ another attempt at reducing creative friction between the artist and the artwork
 ideas
 -----
 
-+ now (technical-ish):
++ todo:
+  - input (key down, mouse click) etc. notification
+  - draw order
+  - gui
+    - event capture
+    - focus
+    - alignment (vertica/horizontal tabular)
+    - rect
+    - text
+    - textedit (based on text?)
+    - button (rect + text)
+    - input (rect + textedit)
+  - in-game output console
+  - sprite
+
++ potential:
+    - coroutines for `cont()` instead of `entity._proto_order()`
+
++ now:
     - entities are each slot-value mappings
     - each entity can ordered list multiple 'protos'
     - slots of e are looked up recursively in e's protos in order, depth first
@@ -36,17 +54,6 @@ ideas
       etc.
     - recipe and image format is actually the same (: homoiconicity! --
       human-readable code and image format basically same -- human-machine
-
-+ future (philosophy-ish):
-    - create basic visual sprite entity
-        - other basics handled by love
-        - consider boilerplate requirements cgame had and obsolete them through
-        good design
-    - start really early on gui design so that interface evolves with abstract
-      idea
-    - try to get people to use it
-
-    - try using coroutines for `cont()` and remove `entity._proto_order()`
 
 
 how to play
