@@ -25,7 +25,7 @@ function test_protos:player()
   return entity.adds {
     {
       _name = 'player',
-      _protos = { 'drawable', 'update', 'transform' },
+      _protos = { 'drawable', 'update', 'input', 'transform' },
       
       dir = 1,
       position = vec2(10, 200),
@@ -51,6 +51,10 @@ function methods.player.draw(self, cont)
   love.graphics.pop()
 end
 
+function methods.player.keypressed(self, cont, unicode)
+  print('key pressed: ' .. unicode)
+end
+
 
 -- scene
 
@@ -58,7 +62,11 @@ test_scene = recipe.new('test_scene')
 
 function test_scene:main()
   return entity.adds {
-    { _protos = { 'alive', 'player', 'rotator' } }
+    {
+      _protos = { 'alive', 'player', 'rotator' },
+
+      inputting = true,
+    }
   }
 end
 
