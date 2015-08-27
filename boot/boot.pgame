@@ -28,6 +28,17 @@ do local _={
   updating=true
  },
  {
+  _id="a43c1b0aa53a0c908810c",
+  _name="input",
+  _proto_ids={
+   "f5e638cc78dd325906c12"
+  },
+  inputting=false,
+  joysticking=false,
+  keyboarding=false,
+  mousing=false
+ },
+ {
   _id="c571a3227368b17e0ecc3",
   _name="drawable",
   _proto_ids={
