@@ -9,7 +9,7 @@ ideas
 -----
 
 + todo:
-  - input (key down, mouse click) etc. notification
+  - cameras
   - draw order
   - gui
     - event capture
@@ -64,7 +64,12 @@ Make sure you have [love2d](https://love2d.org/).
 ```
 git clone https://github.com/nikki93/pgame
 cd pgame
-love .
 ```
+
+Running simply `love .` will load the boot image `boot/boot.pgame`, which is created from the `bootstrap` recipe as described in the code in `boot/`. To recreate this image you can run `love . --bootstrap new_boot.pgame`, which dumps `new_boot.pgame` as a new boot image. The boot image contains basic entities such as `entity`, `update` and `transform`.
+
+A different boot image can be loaded with `love . --boot input_image.pgame`. So you could load the default boot image, modify the world a bit, save a new one, then load that in the future.
+
+The first of the remaining arguments gives a directory to load methods from, then the rest of them should name images to be loaded in order.
 
 
