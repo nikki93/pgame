@@ -7,7 +7,7 @@ function bootstrap:transform()
       _name = 'transform',
       _protos = { 'entity' },
 
-      position = vec2(10, 10), -- world-space position
+      position = vec2(0, 0), -- world-space position
       rotation = 0, -- world-space rotation
       scale = vec2(1, 1), -- world-space scale
     }
