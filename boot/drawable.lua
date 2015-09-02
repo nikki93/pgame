@@ -30,7 +30,7 @@ function methods.drawable.draw_rsubs(self, cont, camera)
   -- draw positive depth with the camera transform
   if camera then
     love.graphics.push()
-    camera:inverse_view_transform()
+    camera:apply_view_transform()
   end
   while i <= n do
     local e = rsubs[i]

@@ -16,7 +16,8 @@ function bootstrap:camera()
   }
 end
 
-function methods.camera.inverse_view_transform(self, cont)
+-- apply view transform on current love context
+function methods.camera.apply_view_transform(self, cont)
   love.graphics.rotate(-self.rotation)
   love.graphics.scale(1 / self.scale[1], 1 / self.scale[2])
   love.graphics.translate(-self.position[1], -self.position[2])
