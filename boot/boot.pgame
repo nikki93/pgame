@@ -68,6 +68,7 @@ do local _={
   _proto_ids={
    "f5e638cc78dd325906c12"
   },
+  depth=100,
   drawing=false
  }
 }
