@@ -39,21 +39,36 @@ do local _={
   mousing=false
  },
  {
+  _id="d825c53d89d9cacb3e034",
+  _name="transform",
+  _proto_ids={
+   "f5e638cc78dd325906c12"
+  },
+  position=vec2(0,0),
+  rotation=0,
+  scale=vec2(1,1)
+ },
+ {
+  _id="dd6d2dcc679d12b9430a9",
+  _name="camera",
+  _proto_ids={
+   "d825c53d89d9cacb3e034"
+  }
+ },
+ {
+  _id="c1498e9744ffa104e2c58",
+  _name="main_camera",
+  _proto_ids={
+   "dd6d2dcc679d12b9430a9"
+  }
+ },
+ {
   _id="c571a3227368b17e0ecc3",
   _name="drawable",
   _proto_ids={
    "f5e638cc78dd325906c12"
   },
   drawing=false
- },
- {
-  _id="d825c53d89d9cacb3e034",
-  _name="transform",
-  _proto_ids={
-   "f5e638cc78dd325906c12"
-  },
-  position=vec2(10,10),
-  rotation=0
  }
 }
 return _

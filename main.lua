@@ -57,7 +57,9 @@ end
 
 function love.draw()
   love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-  if entities.drawable then entities.drawable:draw_rsubs() end
+  if entities.drawable then
+    entities.drawable:draw_rsubs(entities.main_camera)
+  end
 end
 
 
