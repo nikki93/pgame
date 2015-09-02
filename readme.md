@@ -9,14 +9,12 @@ ideas
 -----
 
 + todo:
-  - cameras
-  - draw order
   - gui
-    - event capture
-    - focus
-    - alignment (vertica/horizontal tabular)
     - rect
     - text
+    - event capture
+    - alignment (vertical/horizontal tabular)
+    - focus
     - textedit (based on text?)
     - button (rect + text)
     - input (rect + textedit)
