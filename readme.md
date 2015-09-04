@@ -133,7 +133,7 @@ realization of them (of course, it's ok for the design process)
 the vision is to store documentation in entities so that it can be queried
 through the system (i.e., inspect an entity, ask for its main documentation,
 documentation or a slot or method, for the filename of the function associated
-with the method (see lua's debug.getinfo(...))...)
+with the method (see lua's `debug.getinfo(...)`)
 
 the documentation could be more than plaintext--link to other entities (opens
 inspector), potentially include formatting/images, a 'realtime preview' rendered
