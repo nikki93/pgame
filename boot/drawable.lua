@@ -1,4 +1,16 @@
--- can be visualized
+-- rsubs of this can be drawn by implementing `drawable.draw`:
+--   they are automatically drawn to the main window through the main camera per
+--   frame, and can also be drawn to other targets from other viewpoints (see
+--   `drawable.draw_rsubs`, `camera`)
+--
+--   their visibility is set by `drawable.drawing` (initially invisible) (see
+--   `alive`)
+--
+--   use `drawing.depth` to determine draw order and whether an entity ignores
+--   viewpoint (eg. the HUD)
+--
+-- todo:
+--   rename `drawable.drawing` to 'visible'?
 
 function bootstrap:drawable()
   self:depends('entity')
@@ -13,8 +25,12 @@ function bootstrap:drawable()
   }
 end
 
+-- draw self to current love render target (make sure to take world orientation
+-- into account)
 function methods.drawable.draw(self, cont) cont() end
 
+-- draw all `drawable` rsubs with given camera as viewpoint to the current love
+-- render target (usually the main window, but possibly a Canvas etc.)
 local function _depth_gt(a, b)
   -- break ties by id for stability
   if a.depth == b.depth then return a._id < b._id end

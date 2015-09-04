@@ -1,4 +1,4 @@
--- world-space rigid transformation with anisotropic scaling
+-- rsubs of this have world-space position/rotation/scale
 
 function bootstrap:transform()
   self:depends('entity')

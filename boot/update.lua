@@ -1,4 +1,7 @@
--- updated every frame
+-- rsubs of this can be stepped ahead in time by implementing `update.update`:
+--   they are automatically stepped forward per frame of the game
+--
+--   they can be paused/unpaused using `drawing.updating` (initially paused)
 
 function bootstrap:update()
   self:depends('entity')

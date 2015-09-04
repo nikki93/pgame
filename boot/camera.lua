@@ -1,6 +1,6 @@
--- a world-space viewport to map to the screen-space viewport when drawing --
--- start with a viewport with top-left at (0, 0) with the same pixel size as the
--- render target, then apply transformation described by 'transform'
+-- rsubs of this give a viewpoint for `drawable` to visualize the world:
+--   the viewport is a rectangle of the same pixel size as the visualization
+--   target (like the main window), oriented by `transform` trait
 
 function bootstrap:camera()
   self:depends('transform')
