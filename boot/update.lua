@@ -2,6 +2,7 @@
 --   they are automatically stepped forward per frame of the game
 --
 --   they can be paused/unpaused using `drawing.updating` (initially paused)
+--   (see `alive`)
 
 function bootstrap:update()
   self:depends('entity')
