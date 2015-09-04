@@ -71,3 +71,11 @@ A different boot image can be loaded with `love . --boot input_image.pgame`. So 
 The first of the remaining arguments gives a directory to load methods from, then the rest of them should name images to be loaded in order.
 
 
+how to design entities
+----------------------
+
+for any entity that you plan to derive from, ask the question:
+    what is it that entities that derive from me are endowed with?
+this gives you the documentation of the entity, and the entity is defined by its documentation--it must be expressed both in implementation by code and explanation to the user through documentation
+
+
