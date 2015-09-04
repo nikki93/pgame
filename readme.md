@@ -119,12 +119,12 @@ documentation must be well organized:
   - have per-entity documentation of what the instance represents by itself (if
     it isn't simply a trait), what rsubs are endowed with and under what
     conditions, and a todo section for what future work needs to be done
-  - have per-slot and per-method documentation next to each
+  - have per-slot and per-method documentation
 
 documentation must be /written/ close to its code, it can then be collected in
 other ways for viewing--writing close to code ensures some level of
 code<->documentation invariant maintenance--don't document behavior of other
-entities in this entity (use 'see: ') etc.
+entities in this entity (use 'see: ') etc.--so, docstrings!
 
 as much as possible documentation should be in docstring form however
 abstract--if you have outside-code abstract ideas are just ideas and not a
