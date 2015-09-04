@@ -9,6 +9,10 @@ ideas
 -----
 
 + todo:
+  - docstrings (see 'documentation policy' below)
+    - entity-level
+    - slot-level
+    - method-level
   - gui
     - rect
     - text
@@ -22,7 +26,15 @@ ideas
   - sprite
 
 + potential:
+    - rename 'drawing' to 'visible'
     - coroutines for `cont()` instead of `entity._proto_order()`
+
++ abstract:
+    - individual 'pause/play' and 'visible/invisible' icons (toggling 'updating'
+      and 'drawing') in object inspectors
+        - when editing 'player' trait you might toggle its visibility to see it,
+          but you'd probably never toggle its update
+
 
 + now:
     - entities are each slot-value mappings
@@ -64,18 +76,71 @@ git clone https://github.com/nikki93/pgame
 cd pgame
 ```
 
-Running simply `love .` will load the boot image `boot/boot.pgame`, which is created from the `bootstrap` recipe as described in the code in `boot/`. To recreate this image you can run `love . --bootstrap new_boot.pgame`, which dumps `new_boot.pgame` as a new boot image. The boot image contains basic entities such as `entity`, `update` and `transform`.
+Running simply `love .` will load the boot image `boot/boot.pgame`, which is
+created from the `bootstrap` recipe as described in the code in `boot/`. To
+recreate this image you can run `love . --bootstrap new_boot.pgame`, which dumps
+`new_boot.pgame` as a new boot image. The boot image contains basic entities
+such as `entity`, `update` and `transform`.
 
-A different boot image can be loaded with `love . --boot input_image.pgame`. So you could load the default boot image, modify the world a bit, save a new one, then load that in the future.
+A different boot image can be loaded with `love . --boot input_image.pgame`. So
+you could load the default boot image, modify the world a bit, save a new one,
+then load that in the future.
 
-The first of the remaining arguments gives a directory to load methods from, then the rest of them should name images to be loaded in order.
+The first of the remaining arguments gives a directory to load methods from,
+then the rest of them should name images to be loaded in order.
 
 
 how to design entities
 ----------------------
 
-for any entity that you plan to derive from, ask the question:
-    what is it that entities that derive from me are endowed with?
-this gives you the documentation of the entity, and the entity is defined by its documentation--it must be expressed both in implementation by code and explanation to the user through documentation
+for any entity that you think will have rsubs, keep asking the question:
+    what behavior are entities that derive from me endowed with?
+this gives you the documentation of the entity, and the entity is defined by its
+documentation--it must be expressed both in implementation by code and
+explanation to the user through documentation
 
+anything that doesn't actually cause behavior is accidental complexity /
+internal
+
+
+documentation policy
+--------------------
+
+document early--use documentation as a way to formalize the definition of an
+entity and actually help coding--any error in the documentation is either a bug
+in the code for not matching the documentation, or an error in the documentation
+for not matching the idea
+
+think of it this way: the purpose of an idea is to be realized, and this happens
+by documenting it, because the purpose of code is to make documentation true (it
+isn't true, but the point is to work with such belief)
+
+documentation must be well organized:
+  - have per-entity documentation of what the instance represents by itself (if
+    it isn't simply a trait), what rsubs are endowed with and under what
+    conditions, and a todo section for what future work needs to be done
+  - have per-slot and per-method documentation next to each
+
+documentation must be /written/ close to its code, it can then be collected in
+other ways for viewing--writing close to code ensures some level of
+code<->documentation invariant maintenance--don't document behavior of other
+entities in this entity (use 'see: ') etc.
+
+as much as possible documentation should be in docstring form however
+abstract--if you have outside-code abstract ideas are just ideas and not a
+realization of them (of course, it's ok for the design process)
+
+the vision is to store documentation in entities so that it can be queried
+through the system (i.e., inspect an entity, ask for its main documentation,
+documentation or a slot or method, for the filename of the function associated
+with the method (see lua's debug.getinfo(...))...)
+
+the documentation could be more than plaintext--link to other entities (opens
+inspector), potentially include formatting/images, a 'realtime preview' rendered
+through a camera following the object--all this will be drawn in the
+documentation viewer
+
+for now entities are mentioned by name like `name` and their slots by `name:slot` or `name.slot`
+
+(perhaps this documentation network could be exported to markdown/HTML?)
 
