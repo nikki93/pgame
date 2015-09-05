@@ -2,7 +2,7 @@ bootstrap:adds {
   {
     _name = 'camera',
     _protos = { 'transform' },
-    _doc = [[
+    [[
       rsubs of this give a viewpoint for `drawable` to visualize the world:
         the viewport is a rectangle of the same pixel size as the visualization
         target (like the main window), oriented by `transform` trait
@@ -11,7 +11,7 @@ bootstrap:adds {
   {
     _name = 'main_camera',
     _protos = { 'camera' },
-    _doc = [[
+    [[
       `camera` rsub for the default viewport
       ]],
   }

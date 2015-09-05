@@ -42,7 +42,7 @@ do local _={
   mousing=false
  },
  {
-  _doc="    rsubs of this have world-space position/rotation/scale     \n    ",
+  _doc="    rsubs of this have world-space position/rotation/scale\n    ",
   _id="d825c53d89d9cacb3e034",
   _name="transform",
   _proto_ids={

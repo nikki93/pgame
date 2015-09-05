@@ -1,7 +1,7 @@
 bootstrap:add {
   _name = 'drawable',
   _protos = { 'entity' },
-  _doc = [[
+  [[
     rsubs of this can be drawn by implementing `drawable.draw`:
       they are automatically drawn to the main window through the main camera
       per frame, and can also be drawn to other targets from other viewpoints

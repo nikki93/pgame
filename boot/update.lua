@@ -1,7 +1,7 @@
 bootstrap:add {
   _name = 'update',
   _protos = { 'entity' },
-  _doc = [[
+  [[
     rsubs of this can be stepped ahead in time by implementing
     `update.update`:
       they are automatically stepped forward per frame of the game

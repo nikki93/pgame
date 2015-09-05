@@ -301,6 +301,10 @@ end
 function entity.add(ent)
   setmetatable(ent, nil) -- no fancy stuff, start from a plain table
 
+  -- handy shortcut for doc string
+  if not ent._doc then ent._doc = ent[1] end
+  ent[1] = nil
+
   -- generate id -- hash of name or seed, new uuid if neither
   if not ent._id then
     local seed = ent._name or ent._id_seed

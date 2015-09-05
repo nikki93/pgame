@@ -1,7 +1,7 @@
 bootstrap:add {
   _name = 'transform',
   _protos = { 'entity' },
-  _doc = [[
+  [[
     rsubs of this have world-space position/rotation/scale
     ]],
 

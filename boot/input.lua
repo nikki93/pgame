@@ -1,7 +1,7 @@
 bootstrap:add {
   _name = 'input',
   _protos = { 'entity' },
-  _doc = [[
+  [[
     rsubs of this respond to button input:
       they respond by implementing `input.keypressed`, `input.keyreleased`,
       `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or
