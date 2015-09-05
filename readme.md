@@ -13,6 +13,7 @@ ideas
     - entity-level
     - slot-level
     - method-level
+    - todo list per entity, can query for rsubs' todos!
   - gui
     - rect
     - text
@@ -28,6 +29,12 @@ ideas
 + potential:
     - rename 'drawing' to 'visible'
     - coroutines for `cont()` instead of `entity._proto_order()`
+    - drawing is a sub of drawable, you do drawing:draw_rsubs() per frame (not
+      drawable)
+    - updating is a sub of update(able), you do updating:update_rsubs() per
+      frame (not update(able))
+    - use requireable modules instead of plain scripts for methods--will allow
+      use of require for inter-method-script dependency
 
 + abstract:
     - individual 'pause/play' and 'visible/invisible' icons (toggling 'updating'
