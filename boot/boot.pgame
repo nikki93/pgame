@@ -19,6 +19,22 @@ do local _={
   }
  },
  {
+  _doc="    rsubs of this may be notified of love input events:\n      events are added using `input.register_events`\n    ",
+  _id="a43c1b0aa53a0c908810c",
+  _name="input",
+  _proto_ids={
+   "f5e638cc78dd325906c12"
+  }
+ },
+ {
+  _doc="      rsubs of this are notified of love keyboard, mouse and joystick button\n      events:\n        they respond by implementing `input.keypressed`, `input.keyreleased`,\n        `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n        `input.joystickreleased`, with parameters same as the love events\n      ",
+  _id="7b33a58d49a4f0c9490d5",
+  _name="inputting",
+  _proto_ids={
+   "a43c1b0aa53a0c908810c"
+  }
+ },
+ {
   _doc="    rsubs of this have `update.update` called every frame\n    ",
   _id="836049b9edffe94612838",
   _name="updating",
@@ -51,18 +67,6 @@ do local _={
    "836049b9edffe94612838",
    "d8eb87629476878cb0ec2"
   }
- },
- {
-  _doc="    rsubs of this respond to button input:\n      they respond by implementing `input.keypressed`, `input.keyreleased`,\n      `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n      `input.joystickreleased`, with parameters same as the love events\n\n      they are chosen for notification by the `input.inputting` slot, or for\n      individual devices by the `input.mousing`, `input.keyboarding` or\n      `input.joysticking` slots\n\n    todo:\n      remove individual device flags?\n    ",
-  _id="a43c1b0aa53a0c908810c",
-  _name="input",
-  _proto_ids={
-   "f5e638cc78dd325906c12"
-  },
-  inputting=false,
-  joysticking=false,
-  keyboarding=false,
-  mousing=false
  },
  {
   _doc="    rsubs of this have world-space position/rotation/scale\n    ",

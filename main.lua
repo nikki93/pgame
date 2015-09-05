@@ -38,6 +38,13 @@ function love.load(arg)
   end
   entity.load_file(boot_image)
 
+  -- register input events
+  if entities.inputting then
+    entities.inputting:register_events('keypressed', 'keyreleased',
+                                       'mousepressed', 'mousereleased',
+                                       'joystickpressed', 'joystickreleased')
+  end
+
   -- load game methods and game images
   if arg[1] then method.load(arg[1]) end
   for i = 2, #arg do entity.load_file(arg[i]) end
