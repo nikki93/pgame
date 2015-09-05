@@ -1,30 +1,25 @@
-function bootstrap:drawable()
-  self:depends('entity')
-  return entity.adds {
-    {
-      _name = 'drawable',
-      _protos = { 'entity' },
-      _doc = [[
-        rsubs of this can be drawn by implementing `drawable.draw`:
-          they are automatically drawn to the main window through the main
-          camera per frame, and can also be drawn to other targets from other
-          viewpoints (see `drawable.draw_rsubs`, `camera`)
+bootstrap:add {
+  _name = 'drawable',
+  _protos = { 'entity' },
+  _doc = [[
+    rsubs of this can be drawn by implementing `drawable.draw`:
+      they are automatically drawn to the main window through the main camera
+      per frame, and can also be drawn to other targets from other viewpoints
+      (see `drawable.draw_rsubs`, `camera`)
 
-          their visibility is set by `drawable.drawing` (initially invisible)
-          (see `alive`)
+      their visibility is set by `drawable.drawing` (initially invisible) (see
+      `alive`)
 
-          use `drawing.depth` to determine draw order and whether an entity
-          ignores viewpoint (eg. the HUD)
+      use `drawing.depth` to determine draw order and whether an entity ignores
+      viewpoint (eg. the HUD)
 
-        todo:
-          rename `drawable.drawing` to 'visible'?
-        ]],
+    todo:
+      rename `drawable.drawing` to 'visible'?
+    ]],
 
-      drawing = false, -- whether to receive draw events
-      depth = 100, -- decreases back to front, negative ignores view transform
-    }
-  }
-end
+  drawing = false, -- whether to receive draw events
+  depth = 100, -- decreases back to front, negative ignores view transform
+}
 
 -- draw self to current love render target (make sure to take world orientation
 -- into account)

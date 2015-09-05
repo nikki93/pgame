@@ -23,6 +23,22 @@ recipe._recipe_meta = {
       end
     end,
 
+    -- add a step that runs entity.add on the given table, with the resulting
+    -- step name being the name of the entity -- adds names in '_protos' as
+    -- names of step dependencies
+    add = function (self, ent)
+      assert(ent._name, 'entity should have a name')
+      self[ent._name] = function (self)
+        if ent._protos then self:depends(unpack(ent._protos)) end
+        return { entity.add(ent) }
+      end
+    end,
+
+    -- add many entitya.add steps -- runs self:add on each table in the array
+    adds = function (self, ents)
+      for _, ent in ipairs(ents) do self:add(ent) end
+    end,
+
     -- run the recipe -- steps is the list of target steps to finish, if nil
     -- then finishes all steps -- if filename is given, immediately saves
     -- collected entities to file

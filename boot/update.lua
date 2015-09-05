@@ -1,23 +1,17 @@
+bootstrap:add {
+  _name = 'update',
+  _protos = { 'entity' },
+  _doc = [[
+    rsubs of this can be stepped ahead in time by implementing
+    `update.update`:
+      they are automatically stepped forward per frame of the game
 
-function bootstrap:update()
-  self:depends('entity')
-  return entity.adds {
-    {
-      _name = 'update',
-      _protos = { 'entity' },
-      _doc = [[
-        rsubs of this can be stepped ahead in time by implementing
-        `update.update`:
-          they are automatically stepped forward per frame of the game
+      they can be paused/unpaused using `drawing.updating` (initially paused)
+      (see `alive`)
+    ]],
 
-          they can be paused/unpaused using `drawing.updating` (initially
-          paused) (see `alive`)
-        ]],
-
-      updating = false, -- whether to receive update events
-    }
-  }
-end
+  updating = false, -- whether to receive update events
+}
 
 function methods.update.update(self, cont, dt) cont(dt) end
 

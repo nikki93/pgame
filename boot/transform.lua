@@ -1,17 +1,12 @@
-function bootstrap:transform()
-  self:depends('entity')
-  return entity.adds {
-    {
-      _name = 'transform',
-      _protos = { 'entity' },
-      _doc = [[
-        rsubs of this have world-space position/rotation/scale     
-        ]],
+bootstrap:add {
+  _name = 'transform',
+  _protos = { 'entity' },
+  _doc = [[
+    rsubs of this have world-space position/rotation/scale
+    ]],
 
-      position = vec2(0, 0), -- world-space position
-      rotation = 0, -- world-space rotation
-      scale = vec2(1, 1), -- world-space scale
-    }
-  }
-end
+  position = vec2(0, 0), -- world-space position
+  rotation = 0, -- world-space rotation
+  scale = vec2(1, 1), -- world-space scale
+}
 

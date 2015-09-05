@@ -11,7 +11,7 @@ do local _={
   }
  },
  {
-  _doc="        rsubs of this can be stepped ahead in time by implementing\n        `update.update`:\n          they are automatically stepped forward per frame of the game\n\n          they can be paused/unpaused using `drawing.updating` (initially\n          paused) (see `alive`)\n        ",
+  _doc="    rsubs of this can be stepped ahead in time by implementing\n    `update.update`:\n      they are automatically stepped forward per frame of the game\n\n      they can be paused/unpaused using `drawing.updating` (initially paused)\n      (see `alive`)\n    ",
   _id="3ac340832f29c11538fbe",
   _name="update",
   _proto_ids={
@@ -20,7 +20,7 @@ do local _={
   updating=false
  },
  {
-  _doc="        rsubs of this are part of the observed world:\n          if rsub of `update` they are unpaused, if rsub of `drawable` they are\n          visible (can be overriden by local slots for all cases)\n\n          useful to list all event enabling slots in one place\n        ",
+  _doc="    rsubs of this are part of the observed world:\n      if rsub of `update` they are unpaused, if rsub of `drawable` they are\n      visible (can be overriden by local slots for all cases)\n\n      useful to list all event enabling slots in one place\n    ",
   _id="7bd3d5f5b3cdb13aed632",
   _name="alive",
   _proto_ids={
@@ -30,7 +30,7 @@ do local _={
   updating=true
  },
  {
-  _doc="        rsubs of this respond to button input:\n          they respond by implementing `input.keypressed`, `input.keyreleased`,\n          `input.mousepressed`, `input.mousereleased`, `input.joystickpressed`\n          or `input.joystickreleased`, with parameters same as the love events\n  \n          they are chosen for notification by the `input.inputting` slot, or for\n          individual devices by the `input.mousing`, `input.keyboarding` or\n          `input.joysticking` slots\n\n        todo:\n          remove individual device flags?\n        ",
+  _doc="    rsubs of this respond to button input:\n      they respond by implementing `input.keypressed`, `input.keyreleased`,\n      `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n      `input.joystickreleased`, with parameters same as the love events\n\n      they are chosen for notification by the `input.inputting` slot, or for\n      individual devices by the `input.mousing`, `input.keyboarding` or\n      `input.joysticking` slots\n\n    todo:\n      remove individual device flags?\n    ",
   _id="a43c1b0aa53a0c908810c",
   _name="input",
   _proto_ids={
@@ -42,7 +42,7 @@ do local _={
   mousing=false
  },
  {
-  _doc="        rsubs of this have world-space position/rotation/scale     \n        ",
+  _doc="    rsubs of this have world-space position/rotation/scale     \n    ",
   _id="d825c53d89d9cacb3e034",
   _name="transform",
   _proto_ids={
@@ -53,7 +53,7 @@ do local _={
   scale=vec2(1,1)
  },
  {
-  _doc="        rsubs of this give a viewpoint for `drawable` to visualize the world:\n          the viewport is a rectangle of the same pixel size as the\n          visualization target (like the main window), oriented by `transform`\n          trait\n        ",
+  _doc="      rsubs of this give a viewpoint for `drawable` to visualize the world:\n        the viewport is a rectangle of the same pixel size as the visualization\n        target (like the main window), oriented by `transform` trait\n      ",
   _id="dd6d2dcc679d12b9430a9",
   _name="camera",
   _proto_ids={
@@ -61,7 +61,7 @@ do local _={
   }
  },
  {
-  _doc="        `camera` rsub for the default viewport\n        ",
+  _doc="      `camera` rsub for the default viewport\n      ",
   _id="c1498e9744ffa104e2c58",
   _name="main_camera",
   _proto_ids={
@@ -69,7 +69,7 @@ do local _={
   }
  },
  {
-  _doc="        rsubs of this can be drawn by implementing `drawable.draw`:\n          they are automatically drawn to the main window through the main\n          camera per frame, and can also be drawn to other targets from other\n          viewpoints (see `drawable.draw_rsubs`, `camera`)\n\n          their visibility is set by `drawable.drawing` (initially invisible)\n          (see `alive`)\n  \n          use `drawing.depth` to determine draw order and whether an entity\n          ignores viewpoint (eg. the HUD)\n\n        todo:\n          rename `drawable.drawing` to 'visible'?\n        ",
+  _doc="    rsubs of this can be drawn by implementing `drawable.draw`:\n      they are automatically drawn to the main window through the main camera\n      per frame, and can also be drawn to other targets from other viewpoints\n      (see `drawable.draw_rsubs`, `camera`)\n\n      their visibility is set by `drawable.drawing` (initially invisible) (see\n      `alive`)\n\n      use `drawing.depth` to determine draw order and whether an entity ignores\n      viewpoint (eg. the HUD)\n\n    todo:\n      rename `drawable.drawing` to 'visible'?\n    ",
   _id="c571a3227368b17e0ecc3",
   _name="drawable",
   _proto_ids={
