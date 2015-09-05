@@ -27,7 +27,7 @@ recipe._recipe_meta = {
     -- step name being the name of the entity -- adds names in '_protos' as
     -- names of step dependencies
     add = function (self, ent)
-      assert(ent._name, 'entity should have a name')
+      assert(ent._name, 'entity description table should include a name')
       self[ent._name] = function (self)
         if ent._protos then self:depends(unpack(ent._protos)) end
         return { entity.add(ent) }
