@@ -1,20 +1,19 @@
-bootstrap:adds {
-  {
-    _name = 'camera',
-    _protos = { 'transform' },
-    [[
-      rsubs of this give a viewpoint for `drawable` to visualize the world:
-        the viewport is a rectangle of the same pixel size as the visualization
-        target (like the main window), oriented by `transform` trait
-      ]],
-  },
-  {
-    _name = 'main_camera',
-    _protos = { 'camera' },
-    [[
-      `camera` rsub for the default viewport
-      ]],
-  }
+bootstrap:add {
+  _name = 'camera',
+  _protos = { 'transform' },
+  [[
+    rsubs of this give a viewpoint for `drawable` to visualize the world:
+      the viewport is a rectangle of the same pixel size as the visualization
+      target (like the main window), oriented by `transform` trait
+    ]],
+}
+
+bootstrap:add {
+  _name = 'main_camera',
+  _protos = { 'camera' },
+  [[
+    `camera` rsub for the default viewport
+    ]],
 }
 
 -- apply view transform on current love context

@@ -53,7 +53,7 @@ do local _={
   scale=vec2(1,1)
  },
  {
-  _doc="      rsubs of this give a viewpoint for `drawable` to visualize the world:\n        the viewport is a rectangle of the same pixel size as the visualization\n        target (like the main window), oriented by `transform` trait\n      ",
+  _doc="    rsubs of this give a viewpoint for `drawable` to visualize the world:\n      the viewport is a rectangle of the same pixel size as the visualization\n      target (like the main window), oriented by `transform` trait\n    ",
   _id="dd6d2dcc679d12b9430a9",
   _name="camera",
   _proto_ids={
@@ -61,7 +61,7 @@ do local _={
   }
  },
  {
-  _doc="      `camera` rsub for the default viewport\n      ",
+  _doc="    `camera` rsub for the default viewport\n    ",
   _id="c1498e9744ffa104e2c58",
   _name="main_camera",
   _proto_ids={
