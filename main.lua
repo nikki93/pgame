@@ -51,14 +51,14 @@ function love.update(dt)
     return
   end
 
-  if entities.update then entities.update:update_rsubs(dt) end
+  if entities.updating then entities.updating:update_rsubs(dt) end
   if entities.entity then entities.entity:cleanup() end
 end
 
 function love.draw()
   love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
-  if entities.drawable then
-    entities.drawable:draw_rsubs(entities.main_camera)
+  if entities.drawing then
+    entities.drawing:draw_rsubs(entities.main_camera)
   end
 end
 
