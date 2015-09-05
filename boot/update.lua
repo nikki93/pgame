@@ -1,8 +1,3 @@
--- rsubs of this can be stepped ahead in time by implementing `update.update`:
---   they are automatically stepped forward per frame of the game
---
---   they can be paused/unpaused using `drawing.updating` (initially paused)
---   (see `alive`)
 
 function bootstrap:update()
   self:depends('entity')
@@ -10,6 +5,14 @@ function bootstrap:update()
     {
       _name = 'update',
       _protos = { 'entity' },
+      _doc = [[
+        rsubs of this can be stepped ahead in time by implementing
+        `update.update`:
+          they are automatically stepped forward per frame of the game
+
+          they can be paused/unpaused using `drawing.updating` (initially
+          paused) (see `alive`)
+        ]],
 
       updating = false, -- whether to receive update events
     }

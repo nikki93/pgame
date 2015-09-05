@@ -1,14 +1,3 @@
--- rsubs of this respond to button input:
---   they respond by implementing `input.keypressed`, `input.keyreleased`,
---   `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or
---   `input.joystickreleased`, with parameters same as the love events
---
---   they are chosen for notification by the `input.inputting` slot, or for
---   individual devices by the `input.mousing`, `input.keyboarding` or
---   `input.joysticking` slots
---
--- todo:
---   remove individual device flags?
 
 function bootstrap:input()
   self:depends('entity')
@@ -16,6 +5,19 @@ function bootstrap:input()
     {
       _name = 'input',
       _protos = { 'entity' },
+      _doc = [[
+        rsubs of this respond to button input:
+          they respond by implementing `input.keypressed`, `input.keyreleased`,
+          `input.mousepressed`, `input.mousereleased`, `input.joystickpressed`
+          or `input.joystickreleased`, with parameters same as the love events
+  
+          they are chosen for notification by the `input.inputting` slot, or for
+          individual devices by the `input.mousing`, `input.keyboarding` or
+          `input.joysticking` slots
+
+        todo:
+          remove individual device flags?
+        ]],
 
       inputting = false, -- if true, receive all input events
       mousing = false, -- if true, receive mouse events
