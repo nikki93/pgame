@@ -12,7 +12,7 @@ function bootstrap:drawable()
 
           their visibility is set by `drawable.drawing` (initially invisible)
           (see `alive`)
-  
+
           use `drawing.depth` to determine draw order and whether an entity
           ignores viewpoint (eg. the HUD)
 

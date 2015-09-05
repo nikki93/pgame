@@ -10,7 +10,7 @@ function bootstrap:input()
           they respond by implementing `input.keypressed`, `input.keyreleased`,
           `input.mousepressed`, `input.mousereleased`, `input.joystickpressed`
           or `input.joystickreleased`, with parameters same as the love events
-  
+
           they are chosen for notification by the `input.inputting` slot, or for
           individual devices by the `input.mousing`, `input.keyboarding` or
           `input.joysticking` slots
