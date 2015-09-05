@@ -7,26 +7,27 @@ bootstrap:add {
       per frame, and can also be drawn to other targets from other viewpoints
       (see `drawable.draw_rsubs`, `camera`)
 
-      their visibility is set by `drawable.drawing` (initially invisible) (see
-      `alive`)
-
       use `drawing.depth` to determine draw order and whether an entity ignores
       viewpoint (eg. the HUD)
-
-    todo:
-      rename `drawable.drawing` to 'visible'?
     ]],
 
-  drawing = false, -- whether to receive draw events
   depth = 100, -- decreases back to front, negative ignores view transform
+}
+
+bootstrap:add {
+  _name = 'drawing',
+  _protos = { 'drawable' },
+  [[
+    rubs of this are drawn to the main window per frame
+    ]]
 }
 
 -- draw self to current love render target (make sure to take world orientation
 -- into account)
 function methods.drawable.draw(self, cont) cont() end
 
--- draw all `drawable` rsubs with given camera as viewpoint to the current love
--- render target (usually the main window, but possibly a Canvas etc.)
+-- draw all self rsubs with given camera as viewpoint to the current love render
+-- target (usually the main window, but possibly a Canvas etc.)
 local function _depth_gt(a, b)
   -- break ties by id for stability
   if a.depth == b.depth then return a._id < b._id end
@@ -47,15 +48,14 @@ function methods.drawable.draw_rsubs(self, cont, camera)
   while i <= n do
     local e = rsubs[i]
     if e.depth < 0 then break end
-    if e.drawing then e:draw() end
+    e:draw()
     i = i + 1
   end
   if camera then love.graphics.pop() end
 
   -- draw the rest
   while i <= n do
-    local e = rsubs[i]
-    if e.drawing then e:draw() end
+    rsubs[i]:draw()
     i = i + 1
   end
 end

@@ -11,23 +11,46 @@ do local _={
   }
  },
  {
-  _doc="    rsubs of this can be stepped ahead in time by implementing\n    `update.update`:\n      they are automatically stepped forward per frame of the game\n\n      they can be paused/unpaused using `drawing.updating` (initially paused)\n      (see `alive`)\n    ",
+  _doc="    rsubs of this can be stepped ahead in time by implementing `update.update`\n    ",
   _id="3ac340832f29c11538fbe",
   _name="update",
   _proto_ids={
    "f5e638cc78dd325906c12"
-  },
-  updating=false
+  }
  },
  {
-  _doc="    rsubs of this are part of the observed world:\n      if rsub of `update` they are unpaused, if rsub of `drawable` they are\n      visible (can be overriden by local slots for all cases)\n\n      useful to list all event enabling slots in one place\n    ",
-  _id="7bd3d5f5b3cdb13aed632",
-  _name="alive",
+  _doc="    rsubs of this have `update.update` called every frame\n    ",
+  _id="836049b9edffe94612838",
+  _name="updating",
+  _proto_ids={
+   "3ac340832f29c11538fbe"
+  }
+ },
+ {
+  _doc="    rsubs of this can be drawn by implementing `drawable.draw`:\n      they are automatically drawn to the main window through the main camera\n      per frame, and can also be drawn to other targets from other viewpoints\n      (see `drawable.draw_rsubs`, `camera`)\n\n      use `drawing.depth` to determine draw order and whether an entity ignores\n      viewpoint (eg. the HUD)\n    ",
+  _id="c571a3227368b17e0ecc3",
+  _name="drawable",
   _proto_ids={
    "f5e638cc78dd325906c12"
   },
-  drawing=true,
-  updating=true
+  depth=100
+ },
+ {
+  _doc="    rubs of this are drawn to the main window per frame\n    ",
+  _id="d8eb87629476878cb0ec2",
+  _name="drawing",
+  _proto_ids={
+   "c571a3227368b17e0ecc3"
+  }
+ },
+ {
+  _doc="    rsubs of this are part of the observed world -- they update and and are\n    drawn each frame\n    ",
+  _id="7bd3d5f5b3cdb13aed632",
+  _name="alive",
+  _proto_ids={
+   "836049b9edffe94612838",
+   "d8eb87629476878cb0ec2"
+  }
  },
  {
   _doc="    rsubs of this respond to button input:\n      they respond by implementing `input.keypressed`, `input.keyreleased`,\n      `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n      `input.joystickreleased`, with parameters same as the love events\n\n      they are chosen for notification by the `input.inputting` slot, or for\n      individual devices by the `input.mousing`, `input.keyboarding` or\n      `input.joysticking` slots\n\n    todo:\n      remove individual device flags?\n    ",
@@ -67,16 +90,6 @@ do local _={
   _proto_ids={
    "dd6d2dcc679d12b9430a9"
   }
- },
- {
-  _doc="    rsubs of this can be drawn by implementing `drawable.draw`:\n      they are automatically drawn to the main window through the main camera\n      per frame, and can also be drawn to other targets from other viewpoints\n      (see `drawable.draw_rsubs`, `camera`)\n\n      their visibility is set by `drawable.drawing` (initially invisible) (see\n      `alive`)\n\n      use `drawing.depth` to determine draw order and whether an entity ignores\n      viewpoint (eg. the HUD)\n\n    todo:\n      rename `drawable.drawing` to 'visible'?\n    ",
-  _id="c571a3227368b17e0ecc3",
-  _name="drawable",
-  _proto_ids={
-   "f5e638cc78dd325906c12"
-  },
-  depth=100,
-  drawing=false
  }
 }
 return _
