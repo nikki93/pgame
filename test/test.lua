@@ -63,9 +63,7 @@ test_scene = recipe.new('test_scene')
 function test_scene:main()
   return entity.adds {
     {
-      _protos = { 'alive', 'player', 'rotator' },
-
-      inputting = true,
+      _protos = { 'alive', 'inputting', 'player', 'rotator' },
     }
   }
 end
