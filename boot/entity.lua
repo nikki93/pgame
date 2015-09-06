@@ -106,7 +106,19 @@ function entity.get(id)
 end
 
 
--- sub/proto logic -------------------------------------------------------------
+-- slot logic ------------------------------------------------------------------
+
+entity._slot_desc_meta = {}
+
+-- a slot descriptor which can be used as a slot value in entity descriptors
+-- the table passed in is of the form { value, doc, m1 = v1, m2 = v2, ... }
+-- where 'value' is the value of the slot, 'doc' is the doc string and (m1, v1),
+-- (m2, v2), ... are the metadata associations
+function entity.slot(desc)
+  if not desc.doc then desc.doc = desc[2] end
+  desc[2] = nil
+  return setmetatable(desc, entity._slot_desc_meta)
+end
 
 local function _get_slot(o, k)
   local r
@@ -144,6 +156,15 @@ entity.meta = {
     -- check for setter
     local s = o['set_' .. k]
     if s ~= nil then return s(o, v) end
+
+    -- is a slot descriptor?
+    if getmetatable(v) == entity._slot_desc_meta then
+      local val = v[1]
+      v[1] = nil
+      setmetatable(v, nil)
+      o['meta_' .. k] = v
+      return rawset(o, k, val)
+    end
 
     return rawset(o, k, v)
   end,
@@ -289,42 +310,41 @@ end
 
 -- entity creation utilities ---------------------------------------------------
 
--- add an entity from an 'entity description table'
+-- add an entity from an 'entity descriptor'
 --
--- an entity description table is identical in layout to the entity itself, but
--- can optionally have a '_protos' list instead of '_proto_ids,' directly
--- refering to the proto entities or referring to them by name for convenience
---
--- this function modifies the parameter into the resulting entity
+-- an entity descriptor table is a table of slot name to values to set, with
+-- the following additions:
+--   - can optionally have a '_protos' list instead of '_proto_ids,' directly
+--     refering to the proto entities or referring to them by name for
+--     convenience
+--   - can optionally have an '_id_seed' to seed the id generator, useful if you
+--     want to rename an entity but associate it with the old id
 --
 -- replaces the existing with the same name or id if exists
-function entity.add(ent)
-  setmetatable(ent, nil) -- no fancy stuff, start from a plain table
-
-  -- handy shortcut for doc string
-  if not ent._doc then ent._doc = ent[1] end
-  ent[1] = nil
+function entity.add(t)
+  ent = {}
+  ent._name = t._name
 
   -- generate id -- hash of name or seed, new uuid if neither
-  if not ent._id then
-    local seed = ent._name or ent._id_seed
+  if t._id then
+    ent._id = t._id
+  else
+    local seed = t._name or t._id_seed
     ent._id = (seed and md5.sumhexa(seed) or uuid()):sub(1, 21)
   end
-  ent._id_seed = nil
   local old = entity._ids[ent._id]
 
   -- initialize '_proto_ids' and convert from '_protos' list
-  if not ent._proto_ids then ent._proto_ids = {} end
-  if ent._protos then
+  ent._proto_ids = t._proto_ids or {}
+  if t._protos then
     ent._proto_ids = {}
-    for _, ref in ipairs(ent._protos) do
+    for _, ref in ipairs(t._protos) do
       if type(ref) == 'string' then
         ref = assert(entities[ref], "no entity with name '" .. ref .. "'")
       end
       table.insert(ent._proto_ids, ref._id)
     end
   end
-  ent._protos = nil
   if ent._name ~= 'entity' and next(ent._proto_ids) == nil then
     table.insert(ent._proto_ids, entities.entity._id) -- ensure root proto
   end
@@ -373,35 +393,28 @@ function entity.add(ent)
     if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
   end
 
-  -- set metatable and put in id table
+  -- set metatable and put in id table -- after this methods are available
   setmetatable(ent, entity.meta)
   entity._ids[ent._id] = ent
 
-  -- take out properties with setters
-  local setters = {}
-  for k, v in pairs(ent) do
-    local setter = ent['set_' .. k]
-    if type(setter) == 'function' then
-        setters[setter] = v
-        ent[k] = nil
+  -- set slots -- do this after metatable association
+  local skip = { _protos = true, _id_seed = true }
+  for k, v in pairs(t) do
+    if not skip[k] then
+      if k == 1 then k = '_doc' end -- shortcut for doc
+      ent[k] = v
     end
-  end
-
-  -- TODO: call 'added' event over here
-
-  -- call setters after added event
-  for setter, v in pairs(setters) do
-    setter(ent, v)
   end
 
   return ent
 end
 
 -- add many entities from many entity description tables -- just runs entity.add
--- on each and returns them all
+-- on each and returns all resulting entities as an array
 function entity.adds(ts)
-  for _, t in ipairs(ts) do entity.add(t) end
-  return ts
+  local ents = {}
+  for _, t in ipairs(ts) do table.insert(ents, entity.add(t)) end
+  return ents
 end
 
 
