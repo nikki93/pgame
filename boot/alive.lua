@@ -1,8 +1,9 @@
 bootstrap:add {
+  [[ is updating and visible
+
+     rsubs of this are updated and drawn each frame (see `updating` and
+     `drawing`) ]],
+
   _name = 'alive',
   _protos = { 'updating', 'drawing' },
-  [[
-    rsubs of this are part of the observed world -- they update and and are
-    drawn each frame
-    ]],
 }

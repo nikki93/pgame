@@ -1,22 +1,24 @@
 bootstrap:add {
+  [[ may be notified of input events
+
+     rsubs of this may be notified of love input events:
+       events are added using `input.register_events` ]],
+
   _name = 'input',
   _protos = { 'entity' },
-  [[
-    rsubs of this may be notified of love input events:
-      events are added using `input.register_events`
-    ]],
 }
 
 bootstrap:add {
+  [[ is notified of input events
+
+     rsubs of this are notified of love keyboard, mouse and joystick button
+     events:
+       they respond by implementing `input.keypressed`, `input.keyreleased`,
+       `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or
+       `input.joystickreleased`, with parameters same as the love events ]],
+
   _name = 'inputting',
   _protos = { 'input' },
-  [[
-    rsubs of this are notified of love keyboard, mouse and joystick button
-    events:
-      they respond by implementing `input.keypressed`, `input.keyreleased`,
-      `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or
-      `input.joystickreleased`, with parameters same as the love events
-    ]]
 }
 
 function methods.input.register_events(self, cont, ...)

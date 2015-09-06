@@ -1,17 +1,18 @@
 bootstrap:add {
+  [[ can update with the passage of time
+
+     rsubs of this can be notified of the passage of time per frame by
+     implementing `update.update` ]],
+
   _name = 'update',
   _protos = { 'entity' },
-  [[
-    rsubs of this can be stepped ahead in time by implementing `update.update`
-    ]],
 }
 
 bootstrap:add {
+  [[ gets notified of frame updates ]],
+
   _name = 'updating',
   _protos = { 'update' },
-  [[
-    rsubs of this have `update.update` called every frame
-    ]],
 }
 
 function methods.update.update(self, cont, dt) cont(dt) end

@@ -1,33 +1,36 @@
+require 'boot.entity'
+
 bootstrap:add {
+  [[ can be drawn to a render target
+
+     rsubs of this can be drawn by implementing `drawable.draw`:
+       they are automatically drawn to the main window through the main camera
+       per frame, and can also be drawn to other targets from other viewports
+       (see `drawable.draw_rsubs`, `camera`)
+
+       use `drawing.depth` to determine draw order, and whether an entity
+       ignores viewport orientation (eg. for HUD elements) ]],
+
   _name = 'drawable',
   _protos = { 'entity' },
-  [[
-    rsubs of this can be drawn by implementing `drawable.draw`:
-      they are automatically drawn to the main window through the main camera
-      per frame, and can also be drawn to other targets from other viewpoints
-      (see `drawable.draw_rsubs`, `camera`)
 
-      use `drawing.depth` to determine draw order and whether an entity ignores
-      viewpoint (eg. the HUD)
-    ]],
-
-  depth = 100, -- decreases back to front, negative ignores view transform
+  depth = entity.slot {
+    100, [[ determines draw order (lower depth drawn on top), entities with
+            negative depth ignore the view transform (eg. for HUD elements) ]]
+  }
 }
 
 bootstrap:add {
+  [[ drawn to the main window per frame ]],
+
   _name = 'drawing',
   _protos = { 'drawable' },
-  [[
-    rubs of this are drawn to the main window per frame
-    ]]
 }
 
 -- draw self to current love render target (make sure to take world orientation
 -- into account)
 function methods.drawable.draw(self, cont) cont() end
 
--- draw all self rsubs with given camera as viewpoint to the current love render
--- target (usually the main window, but possibly a Canvas etc.)
 local function _depth_gt(a, b)
   -- break ties by id for stability
   if a.depth == b.depth then return a._id < b._id end
