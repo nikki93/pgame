@@ -4,7 +4,7 @@ method = {}
 function method.load(dir)
   for _, file in ipairs(love.filesystem.getDirectoryItems(dir)) do
     if string.find(file, "%.lua$") then
-      love.filesystem.load(dir .. '/' .. file)()
+      require(dir .. '.' .. string.gsub(file, '%.lua$', ''))
     end
   end
 end
