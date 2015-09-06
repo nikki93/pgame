@@ -27,7 +27,7 @@ do local _={
   }
  },
  {
-  _doc="      rsubs of this are notified of love keyboard, mouse and joystick button\n      events:\n        they respond by implementing `input.keypressed`, `input.keyreleased`,\n        `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n        `input.joystickreleased`, with parameters same as the love events\n      ",
+  _doc="    rsubs of this are notified of love keyboard, mouse and joystick button\n    events:\n      they respond by implementing `input.keypressed`, `input.keyreleased`,\n      `input.mousepressed`, `input.mousereleased`, `input.joystickpressed` or\n      `input.joystickreleased`, with parameters same as the love events\n    ",
   _id="7b33a58d49a4f0c9490d5",
   _name="inputting",
   _proto_ids={
