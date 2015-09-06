@@ -1,3 +1,5 @@
+dbg = require('lib.debugger')
+
 -- main events -----------------------------------------------------------------
 
 function love.load(arg)
@@ -5,7 +7,6 @@ function love.load(arg)
 
   -- libraries
   serpent = require('lib.serpent')
-  dbg = require('lib.debugger')
   require('socket') -- for uuid
   uuid = require('lib.uuid')
   uuid.seed()
@@ -88,7 +89,7 @@ function love.run()
 
   if love.event then love.event.pump() end
 
-  if love.load then love.load(arg) end
+  if love.load then safe_call(function () love.load(arg) end) end
 
   -- we don't want the first frame's dt to include time taken by love.load
   if love.timer then love.timer.step() end
