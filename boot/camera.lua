@@ -17,6 +17,8 @@ bootstrap:add {
 }
 
 -- apply view transform on current love context
+method.doc [[ apply a transform that maps world-space coordinates to their
+              coordinates in the camera view space ]]
 function methods.camera.apply_view_transform(self, cont)
   love.graphics.rotate(-self.rotation)
   love.graphics.scale(1 / self.scale[1], 1 / self.scale[2])

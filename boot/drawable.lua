@@ -27,8 +27,8 @@ bootstrap:add {
   _protos = { 'drawable' },
 }
 
--- draw self to current love render target (make sure to take world orientation
--- into account)
+method.doc [[ draw self to current love render target (make sure to take world
+              orientation into account) ]]
 function methods.drawable.draw(self, cont) cont() end
 
 local function _depth_gt(a, b)
@@ -36,6 +36,9 @@ local function _depth_gt(a, b)
   if a.depth == b.depth then return a._id < b._id end
   return a.depth > b.depth
 end
+
+method.doc [[ draw all rsubs to the current love render target, as viewed from
+              the given `camera` ]]
 function methods.drawable.draw_rsubs(self, cont, camera)
   -- compute decreasing depth order
   local rsubs = {}
