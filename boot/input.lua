@@ -21,7 +21,7 @@ bootstrap:add {
   _protos = { 'input' },
 }
 
-methods.doc [[ register love input callbacks for event names in '...', meant for
+method.doc [[ register love input callbacks for event names in '...', meant for
                internal use and is called automatically ]]
 function methods.input.register_events(self, cont, ...)
   for _, event in pairs({ ... }) do

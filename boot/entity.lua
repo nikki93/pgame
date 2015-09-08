@@ -245,7 +245,7 @@ function methods.entity.remove_proto(self, cont, proto)
   end
 end
 
-methods.doc [[ return all subs, recursively, as a set ]]
+method.doc [[ return all subs, recursively, as a set ]]
 function methods.entity.rsubs(self, cont)
   local result = {}
   local function collect(e)
@@ -262,7 +262,7 @@ function methods.entity.rsubs(self, cont)
 end
 
 
-methods.doc [[ immediately forget an entity and disconnect its sub/proto links,
+method.doc [[ immediately forget an entity and disconnect its sub/proto links,
                remember to call cont() (generally at end) while overriding! ]]
 function methods.entity.destroy(self, cont)
   -- remove from subs' list of _proto_ids
@@ -281,7 +281,7 @@ function methods.entity.destroy(self, cont)
   if name then entities[name] = nil end
 end
 
-methods.doc [[ mark an entity to be destroyed on the next `entity.cleanup` call
+method.doc [[ mark an entity to be destroyed on the next `entity.cleanup` call
                (next frame update by default) ]]
 function methods.entity.mark_destroy(self, cont)
   if not entity._destroy_marks.ids[self._id] then
@@ -290,21 +290,21 @@ function methods.entity.mark_destroy(self, cont)
   end
 end
 
-methods.doc [[ destroy all entities marked with `entity.mark_destroy` ]]
+method.doc [[ destroy all entities marked with `entity.mark_destroy` ]]
 function methods.entity.cleanup(self, cont)
   for _, id in ipairs(entity._destroy_marks.ord) do entity.get(id):destroy() end
   entity._destroy_marks = { ord = {}, ids = {} }
 end
 
 
-methods.doc [[ called on string conversion with tostring(self) ]]
+method.doc [[ called on string conversion with tostring(self) ]]
 function methods.entity.to_string(self, cont)
   return '<ent:' .. (self:get_name() or self._id) .. '>'
 end
 
 
 -- get the metadata for slot named slotname -- nil if not found
-methods.doc [[ get metadata for slot named slotname, nil if not found ]]
+method.doc [[ get metadata for slot named slotname, nil if not found ]]
 function methods.entity.slot_meta(self, cont, slotname)
   -- check in self
   local meta = rawget(self, 'meta_' .. slotname)
