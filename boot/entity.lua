@@ -175,7 +175,7 @@ entity.meta = {
 
   -- to skip slots starting with '_' on serialization
   __keyallow = function (o, k)
-    return o:slot_meta(k, 'saveload') ~= false
+    return o:slot_meta(k).saveload ~= false
   end
 }
 
@@ -299,12 +299,23 @@ function methods.entity.to_string(self, cont)
 end
 
 
--- get the metadata for slot named slotname -- optionally indexing into the
--- metadata table with name index -- nil if not found
-function methods.entity.slot_meta(self, cont, slotname, index)
-  local meta = self['meta_' .. slotname]
-  if index then return meta and meta[index] end
-  return meta
+-- get the metadata for slot named slotname -- nil if not found
+function methods.entity.slot_meta(self, cont, slotname)
+  -- check in self
+  local meta = rawget(self, 'meta_' .. slotname)
+  if meta then return meta end
+
+  -- check for method
+  meta = rawget(self, '_method_entries')[slotname]
+  if meta then return meta end
+
+  -- check recursively in each proto if not starting with '_'
+  if slotname:sub(1, 1) == '_' then return end
+  for _, proto in ipairs(rawget(self, '_proto_ids')) do
+    meta = entity.get(proto):slot_meta(slotname)
+    if meta then return meta end
+  end
+  return nil
 end
 
 
