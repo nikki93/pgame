@@ -38,7 +38,8 @@ method._method_table_meta = {
         end
         return cont(...)
       end
-      rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v }
+      rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v,
+                                   doc = method._next_doc }
     elseif v == nil then
       -- remove a method?
       rawget(o, '_entries')[k] = nil
@@ -73,4 +74,11 @@ method._methods_meta = {
 }
 
 methods = setmetatable({ _entries = {} }, method._methods_meta)
+
+-- add documentation to next defined method
+method._next_doc = nil
+function method.doc(doc)
+  method._next_doc = doc
+end
+
 
