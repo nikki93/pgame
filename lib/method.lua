@@ -40,6 +40,7 @@ method._method_table_meta = {
       end
       rawget(o, '_entries')[k] = { entrypoint = entrypoint, func = v,
                                    doc = method._next_doc }
+      method._next_doc = nil
     elseif v == nil then
       -- remove a method?
       rawget(o, '_entries')[k] = nil
