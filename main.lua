@@ -64,7 +64,8 @@ function love.update(dt)
 end
 
 function love.draw()
-  love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+  love.graphics.setColor(255, 255, 255, 255)
+  love.graphics.print("Current FPS: "..tostring(love.timer.getFPS()), 10, 10)
   if entities.drawing then
     entities.drawing:draw_rsubs(entities.main_camera)
   end
