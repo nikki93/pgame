@@ -322,6 +322,13 @@ function methods.entity.slot_meta(self, cont, slotname)
   return nil
 end
 
+method.doc [[ shortcut for self:slot_meta(slotname).doc, nil if no slot
+               metadata ]]
+function methods.entity.slot_doc(self, cont, slotname)
+  local m = self:slot_meta(slotname)
+  if m then return m.doc end
+end
+
 
 -- entity creation utilities ---------------------------------------------------
 
