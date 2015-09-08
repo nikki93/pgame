@@ -303,7 +303,6 @@ function methods.entity.to_string(self, cont)
 end
 
 
--- get the metadata for slot named slotname -- nil if not found
 method.doc [[ get metadata for slot named slotname, nil if not found ]]
 function methods.entity.slot_meta(self, cont, slotname)
   -- check in self
