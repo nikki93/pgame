@@ -1,5 +1,5 @@
 bootstrap:add {
-  [[ has world-space position, rotation and scale ]],
+  DOC[[ has world-space position, rotation and scale ]],
 
   _name = 'transform',
   _protos = { 'entity' },

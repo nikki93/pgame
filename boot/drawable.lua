@@ -1,34 +1,34 @@
 require 'boot.entity'
 
 bootstrap:add {
-  [[ can be drawn to a render target
+  DOC[[ can be drawn to a render target
 
-     rsubs of this can be drawn by implementing `drawable.draw`:
-       they are automatically drawn to the main window through the main camera
-       per frame, and can also be drawn to other targets from other viewports
-       (see `drawable.draw_rsubs`, `camera`)
+        rsubs of this can be drawn by implementing `drawable.draw`:
+          they are automatically drawn to the main window through the main
+          camera per frame, and can also be drawn to other targets from other
+          viewports (see `drawable.draw_rsubs`, `camera`)
 
-       use `drawing.depth` to determine draw order, and whether an entity
-       ignores viewport orientation (eg. for HUD elements) ]],
+          use `drawing.depth` to determine draw order, and whether an entity
+          ignores viewport orientation (eg. for HUD elements) ]],
 
   _name = 'drawable',
   _protos = { 'entity' },
 
   depth = entity.slot {
-    100, [[ determines draw order (lower depth drawn on top), entities with
-            negative depth ignore the view transform (eg. for HUD elements) ]]
+    100, DOC[[ determines draw order (lower depth drawn on top), entities with
+               negative depth ignore view transform (eg. for HUD elements) ]]
   }
 }
 
 bootstrap:add {
-  [[ drawn to the main window per frame ]],
+  DOC[[ drawn to the main window per frame ]],
 
   _name = 'drawing',
   _protos = { 'drawable' },
 }
 
-method.doc [[ draw self to current love render target (make sure to take world
-              orientation into account) ]]
+DOC[[ draw self to current love render target (make sure to take world
+      orientation into account) ]]
 function methods.drawable.draw(self, cont) cont() end
 
 local function _depth_gt(a, b)
@@ -37,8 +37,8 @@ local function _depth_gt(a, b)
   return a.depth > b.depth
 end
 
-method.doc [[ draw all rsubs to the current love render target, as viewed from
-              the given `camera` ]]
+DOC[[ draw all rsubs to the current love render target, as viewed from the given
+      `camera` ]]
 function methods.drawable.draw_rsubs(self, cont, camera)
   -- compute decreasing depth order
   local rsubs = {}

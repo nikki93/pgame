@@ -1,8 +1,8 @@
 bootstrap:add {
-  [[ is updating and visible
+  DOC[[ is updating and visible
 
-     rsubs of this are updated and drawn each frame (see `updating` and
-     `drawing`) ]],
+        rsubs of this are updated and drawn each frame (see `updating` and
+        `drawing`) ]],
 
   _name = 'alive',
   _protos = { 'updating', 'drawing' },
