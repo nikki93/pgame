@@ -6,7 +6,16 @@ doc._last_doc = nil
 -- initially 'unclaimed' (not attached to any entity/slot/method) -- d:claim()
 -- claims it and returns the documentation string, or nil if already claimed --
 -- can be used to prevent accidentally assigning the same doc to multiple things
+--
+-- also 'fixes' indentation in the string: indentation on the first line is
+-- removed, and the rest of the string is shifted left as far as possible while
+-- maintaining relative indentation between lines
 function DOC(str)
+  -- fix documentation indentation
+  local min = math.huge
+  for c in str:gmatch('\n +') do if #c - 1 < min then min = #c - 1 end end
+  str = str:gsub('^ *', ''):gsub('\n' .. string.rep(' ', min), '\n')
+
   -- create doc object, save it as last doc, return
   local d = {
     claimed = false,

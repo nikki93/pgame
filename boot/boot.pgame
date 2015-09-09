@@ -11,7 +11,7 @@ do local _={
   }
  },
  {
-  _doc=" can update with the passage of time\n\n        rsubs of this can be notified of the passage of time per frame by\n        implementing `update.update` ",
+  _doc="can update with the passage of time\n\nrsubs of this can be notified of the passage of time per frame by\nimplementing `update.update` ",
   _id="3ac340832f29c11538fbe",
   _name="update",
   _proto_ids={
@@ -19,7 +19,7 @@ do local _={
   }
  },
  {
-  _doc=" may be notified of input events\n\n        rsubs of this may be notified of love input events:\n          events are added using `input.register_events` ",
+  _doc="may be notified of input events\n\nrsubs of this may be notified of love input events:\n  events are added using `input.register_events` ",
   _id="a43c1b0aa53a0c908810c",
   _name="input",
   _proto_ids={
@@ -27,7 +27,7 @@ do local _={
   }
  },
  {
-  _doc=" is notified of input events\n\n        rsubs of this are notified of love keyboard, mouse and joystick button\n        events:\n          they respond by implementing `input.keypressed`, `input.keyreleased`,\n          `input.mousepressed`, `input.mousereleased`, `input.joystickpressed`\n          or `input.joystickreleased`, with parameters same as the corresponding\n          love events ",
+  _doc="is notified of input events\n\nrsubs of this are notified of love keyboard, mouse and joystick button\nevents:\n  they respond by implementing `input.keypressed`, `input.keyreleased`,\n  `input.mousepressed`, `input.mousereleased`, `input.joystickpressed`\n  or `input.joystickreleased`, with parameters same as the corresponding\n  love events ",
   _id="7b33a58d49a4f0c9490d5",
   _name="inputting",
   _proto_ids={
@@ -35,7 +35,7 @@ do local _={
   }
  },
  {
-  _doc=" gets notified of frame updates ",
+  _doc="gets notified of frame updates ",
   _id="836049b9edffe94612838",
   _name="updating",
   _proto_ids={
@@ -43,7 +43,7 @@ do local _={
   }
  },
  {
-  _doc=" can be drawn to a render target\n\n        rsubs of this can be drawn by implementing `drawable.draw`:\n          they are automatically drawn to the main window through the main\n          camera per frame, and can also be drawn to other targets from other\n          viewports (see `drawable.draw_rsubs`, `camera`)\n\n          use `drawing.depth` to determine draw order, and whether an entity\n          ignores viewport orientation (eg. for HUD elements) ",
+  _doc="can be drawn to a render target\n\nrsubs of this can be drawn by implementing `drawable.draw`:\n  they are automatically drawn to the main window through the main\n  camera per frame, and can also be drawn to other targets from other\n  viewports (see `drawable.draw_rsubs`, `camera`)\n\n  use `drawing.depth` to determine draw order, and whether an entity\n  ignores viewport orientation (eg. for HUD elements) ",
   _id="c571a3227368b17e0ecc3",
   _name="drawable",
   _proto_ids={
@@ -51,11 +51,11 @@ do local _={
   },
   depth=100,
   meta_depth={
-   doc=" determines draw order (lower depth drawn on top), entities with\n               negative depth ignore view transform (eg. for HUD elements) "
+   doc="determines draw order (lower depth drawn on top), entities with\nnegative depth ignore view transform (eg. for HUD elements) "
   }
  },
  {
-  _doc=" drawn to the main window per frame ",
+  _doc="drawn to the main window per frame ",
   _id="d8eb87629476878cb0ec2",
   _name="drawing",
   _proto_ids={
@@ -63,7 +63,7 @@ do local _={
   }
  },
  {
-  _doc=" is updating and visible\n\n        rsubs of this are updated and drawn each frame (see `updating` and\n        `drawing`) ",
+  _doc="is updating and visible\n\nrsubs of this are updated and drawn each frame (see `updating` and\n`drawing`) ",
   _id="7bd3d5f5b3cdb13aed632",
   _name="alive",
   _proto_ids={
@@ -72,27 +72,27 @@ do local _={
   }
  },
  {
-  _doc=" has world-space position, rotation and scale ",
+  _doc="has world-space position, rotation and scale ",
   _id="d825c53d89d9cacb3e034",
   _name="transform",
   _proto_ids={
    "f5e638cc78dd325906c12"
   },
   meta_position={
-   doc=" world-space position "
+   doc="world-space position "
   },
   meta_rotation={
-   doc=" world-space position "
+   doc="world-space position "
   },
   meta_scale={
-   doc=" world-space position "
+   doc="world-space position "
   },
   position=vec2(0,0),
   rotation=0,
   scale=vec2(1,1)
  },
  {
-  _doc=" provide a viewport to visualize the world\n\n        rsubs of this give a viewport for `drawable` to visualize the world:\n          the viewport is a rectangle of the same pixel size as the\n          visualization target (like the main window), oriented by `transform`\n          trait ",
+  _doc="provide a viewport to visualize the world\n\nrsubs of this give a viewport for `drawable` to visualize the world:\n  the viewport is a rectangle of the same pixel size as the\n  visualization target (like the main window), oriented by `transform`\n  trait ",
   _id="dd6d2dcc679d12b9430a9",
   _name="camera",
   _proto_ids={
@@ -100,7 +100,7 @@ do local _={
   }
  },
  {
-  _doc=" the default camera for the main window ",
+  _doc="the default camera for the main window ",
   _id="c1498e9744ffa104e2c58",
   _name="main_camera",
   _proto_ids={
