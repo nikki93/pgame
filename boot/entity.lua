@@ -117,6 +117,7 @@ entity._slot_desc_meta = {}
 function entity.slot(desc)
   if not desc.doc then desc.doc = desc[2] end
   desc[2] = nil
+  if desc.doc then desc.doc = desc.doc:claim() end
   return setmetatable(desc, entity._slot_desc_meta)
 end
 
@@ -421,8 +422,8 @@ function entity.add(t)
   local skip = { _protos = true, _id_seed = true }
   for k, v in pairs(t) do
     if not skip[k] then
-      if k == 1 then k = '_doc' end -- shortcut for doc
-      ent[k] = v
+      if k == 1 then ent['_doc'] = v:claim() -- shortcut for doc
+      else ent[k] = v end
     end
   end
 
