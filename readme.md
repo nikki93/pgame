@@ -31,6 +31,7 @@ ideas
     - coroutines for `cont()` instead of `entity._proto_order()`
     - use requireable modules instead of plain scripts for methods--will allow
       use of require for inter-method-script dependency
+    - use luasocket for scratch handling and add interop with non-emacs editors
 
 + abstract:
     - individual 'pause/play' and 'visible/invisible' icons (toggling 'updating'
