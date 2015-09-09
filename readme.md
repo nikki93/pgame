@@ -1,3 +1,5 @@
+![pgame](screenshot.png "pgame")
+
 in a world of actualities, not cloudy abstractions, work by example -- make an
 example of the monster, then inherit -- a 'proto' -- and now the abstraction is
 a tangible object that is manipulable as data in an editor 
