@@ -11,11 +11,6 @@ ideas
 -----
 
 + todo:
-  - docstrings (see 'documentation policy' below)
-    - entity-level
-    - slot-level
-    - method-level
-    - todo list per entity, can query for rsubs' todos!
   - gui
     - rect
     - text
@@ -25,6 +20,8 @@ ideas
     - textedit (based on text?)
     - button (rect + text)
     - input (rect + textedit)
+  - inspectors
+  - clone object, move slot, inspect multiple objects, force inherit slot, etc.
   - in-game output console
   - sprite
 
@@ -34,6 +31,8 @@ ideas
     - use requireable modules instead of plain scripts for methods--will allow
       use of require for inter-method-script dependency
     - use luasocket for scratch handling and add interop with non-emacs editors
+    - method objects that named objects inherit from, instead of method.name
+      registries?
 
 + abstract:
     - individual 'pause/play' and 'visible/invisible' icons (toggling 'updating'
