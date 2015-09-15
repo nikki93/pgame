@@ -6,7 +6,7 @@ function test_protos:rotator()
   return entity.adds {
     {
       _name = 'rotator',
-      _protos = { 'update', 'transform' },
+      _protos = { methods.rotator, 'update', 'transform' },
 
       rotation_speed = 30,
     }
@@ -25,7 +25,7 @@ function test_protos:player()
   return entity.adds {
     {
       _name = 'player',
-      _protos = { 'drawable', 'update', 'input', 'transform' },
+      _protos = { methods.player, 'drawable', 'update', 'input', 'transform' },
       
       dir = 1,
       position = vec2(10, 200),
