@@ -24,15 +24,17 @@ ideas
   - clone object, move slot, inspect multiple objects, force inherit slot, etc.
   - in-game output console
   - sprite
+  - fix 'slot deletion' to remove metadata too
 
 + potential:
+    - cleanup code organization a bit (esp. after adding new method system)
+    - rewrite metatable definitions to not define functions inline (for easier
+      scratch interop)
     - rename 'drawing' to 'visible'
     - coroutines for `cont()` instead of `entity._proto_order()`
     - use requireable modules instead of plain scripts for methods--will allow
       use of require for inter-method-script dependency
     - use luasocket for scratch handling and add interop with non-emacs editors
-    - method objects that named objects inherit from, instead of method.name
-      registries?
 
 + abstract:
     - individual 'pause/play' and 'visible/invisible' icons (toggling 'updating'
