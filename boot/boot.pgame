@@ -2,9 +2,8 @@ do local _={
  {
   _id="f5e638cc78dd325906c12",
   _name="entity",
-  _proto_ids={},
-  meta__method_entries={
-   saveload=false
+  _proto_ids={
+   "76b7d13e86016112453a9"
   },
   meta__sub_ids={
    saveload=false
@@ -15,6 +14,7 @@ do local _={
   _id="3ac340832f29c11538fbe",
   _name="update",
   _proto_ids={
+   "58d9881956de07d6ab05d",
    "f5e638cc78dd325906c12"
   }
  },
@@ -23,6 +23,7 @@ do local _={
   _id="a43c1b0aa53a0c908810c",
   _name="input",
   _proto_ids={
+   "1bb10cb51ce47c2480e64",
    "f5e638cc78dd325906c12"
   }
  },
@@ -47,6 +48,7 @@ do local _={
   _id="c571a3227368b17e0ecc3",
   _name="drawable",
   _proto_ids={
+   "97671e39416842dad60b5",
    "f5e638cc78dd325906c12"
   },
   depth=100,
@@ -96,6 +98,7 @@ do local _={
   _id="dd6d2dcc679d12b9430a9",
   _name="camera",
   _proto_ids={
+   "6b0443aa82699537bd37a",
    "d825c53d89d9cacb3e034"
   }
  },
