@@ -29,7 +29,11 @@ recipe._recipe_meta = {
     add = function (self, ent)
       assert(ent._name, 'entity description table should include a name')
       self[ent._name] = function (self)
-        if ent._protos then self:depends(unpack(ent._protos)) end
+        local deps = {}
+        for _, p in ipairs(ent._protos) do
+          if self._steps[p] then table.insert(deps, p) end
+        end
+        if ent._protos then self:depends(unpack(deps)) end
         return { entity.add(ent) }
       end
     end,
