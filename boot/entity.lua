@@ -164,7 +164,7 @@ entity.meta = {
       v[1] = nil
       setmetatable(v, nil)
       o['meta_' .. k] = v
-      return rawset(o, k, val)
+      v = val
     end
 
     return rawset(o, k, v)
