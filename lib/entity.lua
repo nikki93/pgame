@@ -153,7 +153,7 @@ function entity._proto_order(e)
 end
 
 
--- entity creation -------------------------------------------------------------
+-- add/remove ------------------------------------------------------------------
 
 -- add an entity from an 'entity descriptor'
 --
@@ -258,6 +258,26 @@ function entity.adds(ts)
   return ents
 end
 
+-- forget an entity (disociate from id, name) and disconnect its sub/proto
+-- links
+function entity.remove(ent)
+  -- remove from subs' list of _proto_ids
+  for sub_id in pairs(rawget(ent, '_sub_ids')) do
+    local ps = rawget(entity.get(sub_id), '_proto_ids')
+    for i = #ps, 1, -1 do if ps[i] == ent._id then table.remove(ps, i) end end
+  end
+
+  -- remove from protos' sets of _sub_ids
+  for _, proto_id in pairs(rawget(ent, '_proto_ids')) do
+    rawget(entity.get(proto_id), '_sub_ids')[ent._id] = nil
+  end
+
+  -- disociate id, name
+  entity._ids[ent._id] = nil
+  local name = ent._name
+  if name then entities[name] = nil end
+end
+
 
 -- method registry -------------------------------------------------------------
 
@@ -281,9 +301,8 @@ entity._method_registry_meta = {
   __newindex = function(o, k, v)
     if v == nil then
       -- destroying a method registry entry
-      -- TODO: separate destruction logic into non-method common function
       local entry = o._entries[k]
-      if entry then methods.entity.destroy(entry) end
+      if entry then entity.remove(entry) end
       return
     end
     rawset(o, k, v)

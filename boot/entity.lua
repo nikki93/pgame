@@ -62,20 +62,7 @@ end
 DOC[[ immediately forget an entity and disconnect its sub/proto links, remember
       to call cont() (generally at end) while overriding! ]]
 function methods.entity.destroy(self, cont)
-  -- remove from subs' list of _proto_ids
-  for sub_id in pairs(rawget(self, '_sub_ids')) do
-    local ps = rawget(entity.get(sub_id), '_proto_ids')
-    for i = 1, #ps do if ps[i] == self._id then table.remove(ps, i) end end
-  end
-
-  -- remove from protos' sets of _sub_ids
-  for _, proto_id in pairs(rawget(self, '_proto_ids')) do
-    rawget(entity.get(proto_id), '_sub_ids')[self._id] = nil
-  end
-
-  entity._ids[self._id] = nil
-  local name = self:get_name()
-  if name then entities[name] = nil end
+  entity.remove(self)
 end
 
 entity._destroy_marks = { ord = {}, ids = {} }
