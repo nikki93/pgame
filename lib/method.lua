@@ -10,11 +10,6 @@ function method.load(dir)
 end
 
 
--- get the method structure for method named m on entity e
-function method._get_method(e, m)
-  return rawget(e, '_method_entries')[m]
-end
-
 -- methods is a table that can be used to associate names with methods by
 -- setting methods.name.methodname, or to remove associations by setting
 -- methods.name or methods.name.methodname to nil
@@ -32,7 +27,7 @@ method._method_table_meta = {
           while true do
             i = i - 1
             if i < 1 then return nil end
-            local pm = method._get_method(ord[i], k)
+            local pm = rawget(ord[i], '_method_entries')[k]
             if pm then return pm.func(self, cont, ...) end
           end
         end
