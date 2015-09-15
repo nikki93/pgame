@@ -21,9 +21,9 @@ function love.load(arg)
   md5 = require('lib.md5')
   require('lib.doc')
   require('lib.scratch')
-  require('lib.method')
   require('lib.recipe')
   require('lib.vec2')
+  require('lib.entity')
 
   -- load boot methods
   bootstrap = recipe.new('bootstrap')
@@ -37,8 +37,7 @@ function love.load(arg)
     return
   end
 
-  -- bootstrap universe only, then load boot image
-  bootstrap:run(nil, { 'universe' })
+  -- load boot image
   local boot_image = 'boot/boot.pgame'
   if arg[1] == '--boot' then
     assert(arg[2], 'no image file specified...')

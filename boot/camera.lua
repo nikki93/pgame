@@ -7,7 +7,7 @@ bootstrap:add {
           trait ]],
 
   _name = 'camera',
-  _protos = { 'transform' },
+  _protos = { methods.camera, 'transform' },
 }
 
 bootstrap:add {

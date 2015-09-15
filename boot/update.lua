@@ -5,7 +5,7 @@ bootstrap:add {
         implementing `update.update` ]],
 
   _name = 'update',
-  _protos = { 'entity' },
+  _protos = { methods.update, 'entity' },
 }
 
 bootstrap:add {

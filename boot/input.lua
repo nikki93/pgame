@@ -5,7 +5,7 @@ bootstrap:add {
           events are added using `input.register_events` ]],
 
   _name = 'input',
-  _protos = { 'entity' },
+  _protos = { methods.input, 'entity' },
 }
 
 bootstrap:add {

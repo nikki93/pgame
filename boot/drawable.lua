@@ -1,5 +1,3 @@
-require 'boot.entity'
-
 bootstrap:add {
   DOC[[ can be drawn to a render target
 
@@ -12,7 +10,7 @@ bootstrap:add {
           ignores viewport orientation (eg. for HUD elements) ]],
 
   _name = 'drawable',
-  _protos = { 'entity' },
+  _protos = { methods.drawable, 'entity' },
 
   depth = entity.slot {
     100, DOC[[ determines draw order (lower depth drawn on top), entities with
