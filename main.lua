@@ -2,6 +2,14 @@ dbg = require('lib.debugger')
 
 -- main events -----------------------------------------------------------------
 
+function require_all(dir)
+  for _, file in ipairs(love.filesystem.getDirectoryItems(dir)) do
+    if string.find(file, "%.lua$") then
+      require(dir .. '.' .. string.gsub(file, '%.lua$', ''))
+    end
+  end
+end
+
 function love.load(arg)
   table.remove(arg, 1) -- remove love directory argument
 
@@ -19,7 +27,7 @@ function love.load(arg)
 
   -- load boot methods
   bootstrap = recipe.new('bootstrap')
-  method.load('boot')
+  require_all('boot')
 
   -- bootstrap entire system? create boot image and exit
   if arg[1] == '--bootstrap' then
@@ -48,7 +56,7 @@ function love.load(arg)
   end
 
   -- load game methods and game images
-  if arg[1] then method.load(arg[1]) end
+  if arg[1] then require_all(arg[1]) end
   for i = 2, #arg do entity.load_file(arg[i]) end
 end
 
