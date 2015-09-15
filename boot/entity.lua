@@ -366,7 +366,8 @@ function entity.add(t)
       table.insert(ent._proto_ids, ref._id)
     end
   end
-  if ent._name ~= 'entity' and next(ent._proto_ids) == nil then
+  if not (t._protos and next(t._protos) == nil)
+  and ent._name ~= 'entity' and next(ent._proto_ids) == nil then
     table.insert(ent._proto_ids, entities.entity._id) -- ensure root proto
   end
 
