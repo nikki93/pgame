@@ -25,6 +25,10 @@ ideas
   - in-game output console
   - sprite
   - fix 'slot deletion' to remove metadata too
+  - in `_get_slot(...)` don't do a `rawget` cuz lua doesn't call `__index` in
+    that case anyway?
+  - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
+    rproto
 
 + potential:
     - cleanup code organization a bit (esp. after adding new method system)
@@ -95,6 +99,22 @@ then load that in the future.
 
 The first of the remaining arguments gives a directory to load methods from,
 then the rest of them should name images to be loaded in order.
+
+
+terms
+-----
+
++ core
+    - entity
+    - slot
+    - method
+    - proto, rproto, sub, rsub
+    - entity descriptor
+    - slot descriptor
+
++ boot
+    - trait
+    - event
 
 
 how to design entities
