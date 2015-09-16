@@ -2,16 +2,12 @@ test_protos = recipe.new('test_protos')
 
 -- rotator
 
-function test_protos:rotator()
-  return entity.adds {
-    {
-      _name = 'rotator',
-      _protos = { methods.rotator, 'update', 'transform' },
+test_protos:add {
+  _name = 'rotator',
+  _protos = { methods.rotator, 'update', 'transform' },
 
-      rotation_speed = 30,
-    }
-  }
-end
+  rotation_speed = 30,
+}
 
 function methods.rotator.update(self, cont, dt)
   cont(dt)
@@ -21,17 +17,13 @@ end
 
 -- player
 
-function test_protos:player()
-  return entity.adds {
-    {
-      _name = 'player',
-      _protos = { methods.player, 'drawable', 'update', 'input', 'transform' },
-      
-      dir = 1,
-      position = vec2(10, 200),
-    }
-  }
-end
+test_protos:add {
+  _name = 'player',
+  _protos = { methods.player, 'drawable', 'update', 'input', 'transform' },
+  
+  dir = 1,
+  position = vec2(10, 200),
+}
 
 function methods.player.update(self, cont, dt)
   cont(dt)
@@ -60,12 +52,8 @@ end
 
 test_scene = recipe.new('test_scene')
 
-function test_scene:main()
-  return entity.adds {
-    {
-      _protos = { 'alive', 'inputting', 'player', 'rotator' },
-    }
-  }
-end
+test_scene:add {
+  _protos = { 'alive', 'inputting', 'player', 'rotator' },
+}
 
 
