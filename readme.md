@@ -11,6 +11,7 @@ ideas
 -----
 
 + todo:
+  - conceptual docs
   - gui
     - rect
     - text
@@ -25,8 +26,6 @@ ideas
   - in-game output console
   - sprite
   - fix 'slot deletion' to remove metadata too
-  - in `_get_slot(...)` don't do a `rawget` cuz lua doesn't call `__index` in
-    that case anyway?
   - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
     rproto
 
