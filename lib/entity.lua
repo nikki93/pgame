@@ -1,3 +1,8 @@
+-- rudimentary entity logic
+--
+-- NOTE: code here should be general enough to work even for entities that do
+--       not have 'entity' as an rproto (such as method registry entries)
+
 entity = {}
 
 
@@ -12,7 +17,7 @@ function entity.get(id)
   local e = entity._ids[id]
   if e == nil then
     -- avoid concat when no error
-    error ("no entity with id '" .. tostring(id) .. "'")
+    error("no entity with id '" .. tostring(id) .. "'")
   end
   return e
 end
