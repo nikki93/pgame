@@ -34,8 +34,10 @@ end
 -- step name being the name of the entity -- adds names in '_protos' as
 -- names of step dependencies
 function recipe._meta.__index.add(self, ent)
-  assert(ent._name, 'entity description table should include a name')
-  self[ent._name] = function (self)
+  local stepname = ent._name or ('untitled_' .. uuid():sub(1, 7))
+  assert(not self._steps[ent._name], "already defined a step with name '"
+           .. stepname .. "'")
+  self[stepname] = function (self)
     local deps = {}
     for _, p in ipairs(ent._protos) do
       if self._steps[p] then table.insert(deps, p) end
