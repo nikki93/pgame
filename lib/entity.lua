@@ -29,12 +29,26 @@ entities = {}
 
 -- slots -----------------------------------------------------------------------
 
+-- slot descriptors
+--
+-- a slot descriptor can be used as a slot value in entity descriptors
+--
+-- slot descriptors are created using the 'entity.slot' function -- for example:
+--
+--   my_ent = cg.add {
+--     _name = 'test', _protos = { 'entity' },
+--     my_slot = entity.slot { 42, DOC[[ my doc ]], saveload = true, ... }
+--   }
+--
+-- here 'my_slot' is given a value of 42, with metadata 'doc' set to "my doc ",
+-- 'saveload' set to true, and possibly other metadata defined in the elipsis
+--
+-- in general the form is entity.slot t, where t is a table of the form { value,
+-- doc, m1 = v1, m2 = v2, ... } where 'value' is the value of the slot, 'doc' is
+-- the doc string and (m1, v1), (m2, v2), ... are the metadata associations
+
 entity._slot_desc_meta = {}
 
--- a slot descriptor which can be used as a slot value in entity descriptors
--- the table passed in is of the form { value, doc, m1 = v1, m2 = v2, ... }
--- where 'value' is the value of the slot, 'doc' is the doc string and (m1, v1),
--- (m2, v2), ... are the metadata associations
 function entity.slot(desc)
   if not desc.doc then desc.doc = desc[2] end
   desc[2] = nil
@@ -42,6 +56,14 @@ function entity.slot(desc)
   return setmetatable(desc, entity._slot_desc_meta)
 end
 
+
+-- metatable -------------------------------------------------------------------
+
+entity._meta = {}
+
+-- lookup slot 'k' in entity 'o' -- ignores getter method, because otherwise you
+-- get an infinite blowup of 'get_x' then 'get_get_x' and so on -- getter
+-- methods should be handled in the caller of _get_slot(...) if required
 local function _get_slot(o, k)
   local r
 
@@ -66,82 +88,21 @@ local function _get_slot(o, k)
   return nil
 end
 
--- metatable of all entities
-entity.meta = {
-  __index = function (o, k)
-    local r = _get_slot(o, k)
-    if r then return r end
+-- slot lookup entrypoint
+function entity._meta.__index(o, k)
+  local r = _get_slot(o, k)
+  if r then return r end
 
-    -- try getter
-    r = _get_slot(o, 'get_' .. k)
-    if r ~= nil then return r(o) end
-  end,
-
-  __newindex = function (o, k, v)
-    -- check for setter
-    local s = o['set_' .. k]
-    if s ~= nil then return s(o, v) end
-
-    -- is v a slot descriptor?
-    if getmetatable(v) == entity._slot_desc_meta then
-      local val = v[1]
-      v[1] = nil
-      setmetatable(v, nil)
-      o['meta_' .. k] = v
-      v = val
-    end
-
-    -- is o a method registry entry?
-    if rawget(o, '_methods') then
-      -- creating a new method?
-      if type(v) == 'function' then
-        -- need a call-next-method continuation -- the continuation is a closure
-        -- that iterates through the proto order, the entrypoint is a wrapper
-        -- that starts off the chain
-        local function entrypoint(self, ...)
-          local ord = entity._proto_order(self)
-          local i = #ord + 1
-          local function cont(...)
-            while true do
-              i = i - 1
-              if i < 1 then return nil end
-              local r = rawget(ord[i], '_methods')
-              if r then
-                r = r[k]
-                if r then return r.func(self, cont, ...) end
-              end
-            end
-          end
-          return cont(...)
-        end
-        rawget(o, '_methods')[k] = { entrypoint = entrypoint, func = v }
-        local doc = doc.pop_doc()
-        if doc then o['meta_' .. k] = { doc = doc } end
-        return
-      elseif v == nil then -- removing a method?
-        rawget(o, '_methods')[k] = nil
-      end
-    end
-
-    return rawset(o, k, v)
-  end,
-
-  __tostring = function (o)
-    return o:to_string()
-  end,
-
-  -- to skip slots starting with '_' on serialization
-  __keyallow = function (o, k)
-    local meta_k = o:slot_meta(k)
-    return not (meta_k and meta_k.saveload == false)
-  end
-}
+  -- try getter method
+  r = _get_slot(o, 'get_' .. k)
+  if r ~= nil then return r(o) end
+end
 
 -- /reverse/ of order in which protos are visited for methods, an array of
 -- entities -- the order is the reverse of the topological sort order, so that
 -- entities appear after all their protos and ties are broken in right-left
 -- order of _proto_ids list
-function entity._proto_order(e)
+local function _proto_order(e)
   local ord, vis = {}, {}
   local function visit(e)
     if vis[e] then return end
@@ -157,6 +118,69 @@ function entity._proto_order(e)
   return ord
 end
 
+-- slot definition entrypoint -- lua calls this on defining a new key
+function entity._meta.__newindex(o, k, v)
+  -- try setter method
+  local s = o['set_' .. k]
+  if s ~= nil then return s(o, v) end
+
+  -- is v a slot descriptor?
+  if getmetatable(v) == entity._slot_desc_meta then
+    local val = v[1]
+    v[1] = nil
+    setmetatable(v, nil)
+    o['meta_' .. k] = v
+    v = val
+  end
+
+  -- is o a method registry entry?
+  if rawget(o, '_methods') then
+    -- creating a new method?
+    if type(v) == 'function' then
+      -- need a call-next-method continuation -- the continuation is a closure
+      -- that iterates through the proto order, the entrypoint is a wrapper
+      -- that starts off the chain
+      local function entrypoint(self, ...)
+        local ord = _proto_order(self)
+        local i = #ord + 1
+        local function cont(...)
+          while true do
+            i = i - 1
+            if i < 1 then return nil end
+            local r = rawget(ord[i], '_methods')
+            if r then
+              r = r[k]
+              if r then return r.func(self, cont, ...) end
+            end
+          end
+        end
+        return cont(...)
+      end
+      rawget(o, '_methods')[k] = { entrypoint = entrypoint, func = v }
+      local doc = doc.pop_doc()
+      if doc then o['meta_' .. k] = { doc = doc } end
+      return -- don't actually set the value, force __newindex every time
+    elseif v == nil then -- removing a method?
+      rawget(o, '_methods')[k] = nil
+    end
+  end
+
+  return rawset(o, k, v)
+end
+
+-- called by lua on automatic string conversion -- we just call the
+-- entity's ':to_string()' method
+function entity._meta.__tostring(o)
+  return o:to_string()
+end
+
+-- serpent uses this to ask if key and value for key 'k' should be saved on
+-- serialization -- we just check the slot's 'saveload' metadata
+function entity._meta.__keyallow(o, k)
+  local meta_k = o:slot_meta(k)
+  return not (meta_k and meta_k.saveload == false)
+end
+
 
 -- add/remove ------------------------------------------------------------------
 
@@ -169,6 +193,13 @@ end
 --     convenience
 --   - can optionally have an '_id_seed' to seed the id generator, useful if you
 --     want to rename an entity but associate it with the old id
+--
+-- for example: 
+--   my_ent = cg.add {
+--     _name = 'test',
+--     _protos = { 'entity', 'another_proto' },
+--     my_slot = entity.slot { 42, DOC[[ my doc ]], saveload = true, ... }
+--   }
 --
 -- replaces the existing with the same name or id if exists
 function entity.add(t)
@@ -240,7 +271,7 @@ function entity.add(t)
   end
 
   -- set metatable and put in id table -- after this methods are available
-  setmetatable(ent, entity.meta)
+  setmetatable(ent, entity._meta)
   entity._ids[ent._id] = ent
 
   -- set slots -- do this after metatable association
@@ -286,33 +317,48 @@ end
 
 -- method registry -------------------------------------------------------------
 
-entity._method_registry_meta = {
-  __index = function (o, k)
-    -- already created?
+entity._method_registry_meta = {}
+
+-- the method registry (global 'methods') is a special table such that
+-- 'methods.x' gets or creates the method registry entry for 'x' -- a method
+-- registry entry is an entity that only has methods as slots, and can be added
+-- as a proto to any other entity to endow it with those methods
+--
+-- this allows convenient method definition syntax:
+--   function methods.my_entity.my_method(self, cont, ...)
+--     ...
+--   end
+-- then 'methods.my_entity' can be added as a proto for any entity to give it
+-- the method 'my_method' -- this gets around method serialization awkwardness
+-- because methods can simply be defined in scripts, and it allows live
+-- editing/deletion of methods
+
+-- get or create a method registry entry
+function entity._method_registry_meta.__index(o, k)
+  -- already created?
+  local entry = o._entries[k]
+  if entry then return entry end
+
+  -- create a new one -- no protos!
+  entry = entity.add {
+    _name = 'methods_' .. k,
+    _protos = {},
+    _methods = {}, -- this will store the methods
+  }
+  o._entries[k] = entry
+  return entry
+end
+
+-- update a method registry entry -- deletes the entry if v is nil
+function entity._method_registry_meta.__newindex(o, k, v)
+  if v == nil then
+    -- destroying a method registry entry
     local entry = o._entries[k]
-    if entry then return entry end
-
-    -- create a new one -- no protos!
-    entry = entity.add {
-      _name = 'methods_' .. k,
-      _protos = {},
-
-      _methods = {},
-    }
-    o._entries[k] = entry
-    return entry
-  end,
-
-  __newindex = function(o, k, v)
-    if v == nil then
-      -- destroying a method registry entry
-      local entry = o._entries[k]
-      if entry then entity.remove(entry) end
-      return
-    end
-    rawset(o, k, v)
+    if entry then entity.remove(entry) end
+    return
   end
-}
+  rawset(o, k, v)
+end
 
 methods = setmetatable({ _entries = {} }, entity._method_registry_meta)
 
