@@ -11,23 +11,27 @@ ideas
 -----
 
 + todo:
-  - conceptual docs
-  - gui
-    - rect
-    - text
-    - event capture
-    - alignment (vertical/horizontal tabular)
-    - focus
-    - textedit (based on text?)
-    - button (rect + text)
-    - input (rect + textedit)
-  - inspectors
-  - clone object, move slot, inspect multiple objects, force inherit slot, etc.
-  - in-game output console
-  - sprite
-  - fix 'slot deletion' to remove metadata too
-  - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
-    rproto
+    - conceptual docs
+
+
+    - gui
+        - rect
+        - text
+        - event capture
+        - alignment (vertical/horizontal tabular)
+        - focus
+        - textedit (based on text?)
+        - button (rect + text)
+        - input (rect + textedit)
+    - inspectors
+    - clone object, move slot, inspect multiple objects, force inherit slot, etc.
+    - in-game output console
+    - sprite
+
+    - docs for 'entity'
+    - fix 'slot deletion' to remove metadata too
+    - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
+        rproto
 
 + potential:
     - cleanup code organization a bit (esp. after adding new method system)
