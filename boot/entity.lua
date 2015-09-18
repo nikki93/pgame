@@ -62,7 +62,7 @@ end
 DOC[[ immediately forget an entity and disconnect its sub/proto links, remember
       to call cont() (generally at end) while overriding! ]]
 function methods.entity.destroy(self, cont)
-  entity.remove(self)
+  entity._remove(self)
 end
 
 entity._destroy_marks = { ord = {}, ids = {} }
@@ -91,7 +91,7 @@ end
 
 DOC[[ get metadata for slot named slotname, nil if not found ]]
 function methods.entity.slot_meta(self, cont, slotname)
-  return self['meta_' .. slotname]
+  return entity._slot_meta(self, slotname)
 end
 
 DOC[[ shortcut for self:slot_meta(slotname).doc, nil if no slot metadata ]]

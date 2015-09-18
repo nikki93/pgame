@@ -56,6 +56,12 @@ function entity.slot(desc)
   return setmetatable(desc, entity._slot_desc_meta)
 end
 
+-- get metadata table for a slot, nil if not found -- prefer to use :slot_meta()
+-- for `entity` rsubs
+function entity._slot_meta(ent, slotname)
+  return ent['meta_' .. slotname]
+end
+
 
 -- metatable -------------------------------------------------------------------
 
@@ -177,7 +183,7 @@ end
 -- serpent uses this to ask if key and value for key 'k' should be saved on
 -- serialization -- we just check the slot's 'saveload' metadata
 function entity._meta.__keyallow(o, k)
-  local meta_k = o:slot_meta(k)
+  local meta_k = entity._slot_meta(o, k)
   return not (meta_k and meta_k.saveload == false)
 end
 
@@ -295,8 +301,8 @@ function entity.adds(ts)
 end
 
 -- forget an entity (disociate from id, name) and disconnect its sub/proto
--- links
-function entity.remove(ent)
+-- links -- prefer to use :destroy() for `entity` rsubs
+function entity._remove(ent)
   -- remove from subs' list of _proto_ids
   for sub_id in pairs(rawget(ent, '_sub_ids')) do
     local ps = rawget(entity.get(sub_id), '_proto_ids')
@@ -354,7 +360,7 @@ function entity._method_registry_meta.__newindex(o, k, v)
   if v == nil then
     -- destroying a method registry entry
     local entry = o._entries[k]
-    if entry then entity.remove(entry) end
+    if entry then entity._remove(entry) end
     return
   end
   rawset(o, k, v)
