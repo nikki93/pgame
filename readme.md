@@ -32,8 +32,14 @@ ideas
     - fix 'slot deletion' to remove metadata too
     - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
         rproto
+    - switch to 'get_slot_meta()' and 'set_slot_meta()'
 
 + potential:
+    - bootstrap `entity` in 'lib.entity' and move `entity._slot_meta()` etc.
+      into methods again -- will allow setting name in `entity.add()` as a
+      regular slot -- will also separate 'game' library (boot) from super basic
+      entity stuff
+    - rename 'update' to 'updateable' and 'input' to 'inputable' etc.
     - coroutines for `cont()` instead of `entity._proto_order()`
     - use luasocket for scratch handling and add interop with non-emacs editors
 
@@ -79,6 +85,7 @@ will write docs defining everything soon...
     - slot
     - method
     - proto, rproto, sub, rsub
+    - name + method registry relationship
 
     - entity descriptor
     - slot descriptor
