@@ -1,15 +1,5 @@
 do local _={
  {
-  _id="f5e638cc78dd325906c12",
-  _name="entity",
-  _proto_ids={
-   "76b7d13e86016112453a9"
-  },
-  meta__sub_ids={
-   saveload=false
-  }
- },
- {
   _doc="can update with the passage of time\n\nrsubs of this can be notified of the passage of time per frame by\nimplementing `update.update` ",
   _id="3ac340832f29c11538fbe",
   _name="update",
