@@ -53,12 +53,6 @@ function entity.slot(desc)
   return setmetatable(desc, entity._slot_desc_meta)
 end
 
--- get metadata table for a slot, nil if not found -- prefer to use :slot_meta()
--- for `entity` rsubs
-function entity._slot_meta(ent, slotname)
-  return ent['meta_' .. slotname]
-end
-
 
 -- metatable -------------------------------------------------------------------
 
@@ -180,7 +174,7 @@ end
 -- serpent uses this to ask if key and value for key 'k' should be saved on
 -- serialization -- we just check the slot's 'saveload' metadata
 function entity._meta.__keyallow(o, k)
-  local meta_k = entity._slot_meta(o, k)
+  local meta_k = o:slot_meta(k)
   return not (meta_k and meta_k.saveload == false)
 end
 
@@ -297,26 +291,6 @@ function entity.adds(ts)
   return ents
 end
 
--- forget an entity (disociate from id, name) and disconnect its sub/proto
--- links -- prefer to use :destroy() for `entity` rsubs
-function entity._remove(ent)
-  -- remove from subs' list of _proto_ids
-  for sub_id in pairs(rawget(ent, '_sub_ids')) do
-    local ps = rawget(entity.get(sub_id), '_proto_ids')
-    for i = #ps, 1, -1 do if ps[i] == ent._id then table.remove(ps, i) end end
-  end
-
-  -- remove from protos' sets of _sub_ids
-  for _, proto_id in pairs(rawget(ent, '_proto_ids')) do
-    rawget(entity.get(proto_id), '_sub_ids')[ent._id] = nil
-  end
-
-  -- disociate id, name
-  entity._ids[ent._id] = nil
-  local name = ent._name
-  if name then entities[name] = nil end
-end
-
 
 -- method registry -------------------------------------------------------------
 
@@ -357,7 +331,7 @@ function entity._method_registry_meta.__newindex(o, k, v)
   if v == nil then
     -- destroying a method registry entry
     local entry = o._entries[k]
-    if entry then entity._remove(entry) end
+    if entry then entry:destroy() end
     return
   end
   rawset(o, k, v)
@@ -490,7 +464,21 @@ end
 DOC[[ immediately forget an entity and disconnect its sub/proto links, remember
       to call cont() (generally at end) while overriding! ]]
 function methods.entity.destroy(self, cont)
-  entity._remove(self)
+  -- remove from subs' list of _proto_ids
+  for sub_id in pairs(rawget(self, '_sub_ids')) do
+    local ps = rawget(entity.get(sub_id), '_proto_ids')
+    for i = #ps, 1, -1 do if ps[i] == self._id then table.remove(ps, i) end end
+  end
+
+  -- remove from protos' sets of _sub_ids
+  for _, proto_id in pairs(rawget(self, '_proto_ids')) do
+    rawget(entity.get(proto_id), '_sub_ids')[self._id] = nil
+  end
+
+  -- disociate id, name
+  entity._ids[self._id] = nil
+  local name = self._name
+  if name then entities[name] = nil end
 end
 
 entity._destroy_marks = { ord = {}, ids = {} }
@@ -519,7 +507,7 @@ end
 
 DOC[[ get metadata for slot named slotname, nil if not found ]]
 function methods.entity.slot_meta(self, cont, slotname)
-  return entity._slot_meta(self, slotname)
+  return self['meta_' .. slotname]
 end
 
 DOC[[ shortcut for self:slot_meta(slotname).doc, nil if no slot metadata ]]
