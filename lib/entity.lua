@@ -334,7 +334,7 @@ methods = setmetatable({ _entries = {} }, entity._method_registry_meta)
 
 -- save/load -------------------------------------------------------------------
 
--- save entities to a image -- ents must be an array of entities
+-- save entities to an image -- ents must be an array of entities
 function entity.save(ents)
   -- pre-sort array for stability
   local sorted = {}
