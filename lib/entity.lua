@@ -210,7 +210,7 @@ function entity.add(t)
   if t._id then
     ent._id = t._id
   else
-    local seed = t._name or t._id_seed
+    local seed = t._id_seed or t._name_ or t._name
     ent._id = (seed and md5.sumhexa(seed) or uuid()):sub(1, 21)
   end
   t._id_seed = nil
