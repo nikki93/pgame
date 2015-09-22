@@ -19,8 +19,8 @@ function entity.get(id)
   return e
 end
 
--- this table refers to named entities by name, so that entities[o:get_name()]
--- == o, where o is an entity with a name
+-- this table refers to named entities by name, so that entities[o._name] == o,
+-- where o is an entity with a name
 entities = {}
 
 
@@ -201,7 +201,10 @@ end
 -- replaces the existing with the same name or id if exists
 function entity.add(t)
   ent = {}
-  ent._name = t._name
+
+  -- we try to do as much as possible in the :add() method, but to even call
+  -- that method correctly we need to set up proto links and link with the
+  -- metatable
 
   -- generate id -- hash of name or seed, new uuid if neither
   if t._id then
@@ -210,6 +213,7 @@ function entity.add(t)
     local seed = t._name or t._id_seed
     ent._id = (seed and md5.sumhexa(seed) or uuid()):sub(1, 21)
   end
+  t._id_seed = nil
   local old = entity._ids[ent._id]
 
   -- initialize '_proto_ids' and convert from '_protos' list
@@ -224,9 +228,11 @@ function entity.add(t)
     end
   end
   if not (t._protos and next(t._protos) == nil)
-  and ent._name ~= 'entity' and next(ent._proto_ids) == nil then
-    table.insert(ent._proto_ids, entities.entity._id) -- ensure root proto
+  and next(ent._proto_ids) == nil then
+    -- ensure `entity` rproto if _protos not explicitly empty
+    table.insert(ent._proto_ids, entities.entity._id)
   end
+  t._protos = nil
 
   -- dropping old protos: unset in their _sub_id caches
   if old then
@@ -259,27 +265,13 @@ function entity.add(t)
   -- subs: copy from old _sub_id cache or initialize
   rawset(ent, '_sub_ids', old and rawget(old, '_sub_ids') or {})
 
-  -- associate with name and initialize method cache
-  local name = ent._name
-  if name ~= nil then entities[name] = ent end
-  if old then
-    local old_name = old:get_name()
-    if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
-  end
-
-  -- set metatable and put in id table -- after this methods are available
+  -- set metatable and put in id table -- methods are available after this
   setmetatable(ent, entity._meta)
   entity._ids[ent._id] = ent
 
-  -- set slots -- do this after metatable association
-  local skip = { _protos = true, _id_seed = true }
-  for k, v in pairs(t) do
-    if not skip[k] then
-      if k == 1 then ent['_doc'] = v:claim() -- shortcut for doc
-      else ent[k] = v end
-    end
-  end
-
+  -- finally, call :add() method
+  local add_method = ent.add
+  if add_method then add_method(ent, t, old) end
   return ent
 end
 
@@ -398,26 +390,64 @@ end
 
 -- `entity` is its own methods registry entry -- this is needed to properly
 -- bootstrap method handling
-entities.entity = entity.add {
-  _name = 'entity',
+
+entity._entity_desc = {
+  _name_ = 'entity', -- need to directly set _name_, no :set__name() method yet
+  _id_seed = 'entity',
   _protos = {},
   _methods = {}, -- make this a method registry entry
 
   meta__sub_ids = { saveload = false },
 }
+
+-- entity.add(...) won't copy the slots from the descriptor yet here because the
+-- :add() method hasn't been defined -- will call it manually below after
+-- defining
+entities.entity = entity.add(entity._entity_desc)
 methods.entity = entities.entity
 
+
+-- need to associate add method after setting slots (so that '_methods' etc. is
+-- set), so have to do it in this weird way to bootstrap
+
+DOC[[ called when an entity is added, with 'desc' being the entity descriptor
+      table and 'old' the previously existing entity with same id that is being
+      replaced (if one exists)
+
+      the `entity` implementation of this method does some basic things like
+      setting up name lookup and setting slots from 'desc', so remember to call
+      cont() (generally in the beginning) when overriding -- before calling
+      cont(), slots haven't been copied from 'desc' yet ]]
+function entity._entity_add(self, cont, desc, old)
+  -- associate in name map, disocciate old
+  self._name_ = desc._name_
+  if self._name_ ~= nil then entities[self._name_] = ent end
+  if old then
+    local old_name = old._name_
+    if old_name and old_name ~= name then entities[old_name] = nil end
+  end
+
+  -- set slots
+  for k, v in pairs(desc) do
+    if k == 1 then ent._doc = v:claim() -- shortcut for doc
+    else ent[k] = v end
+  end
+end
+entity._entity_add(entities.entity, function () end, entity._entity_desc, nil)
+methods.entity.add = entity._entity_add
+
+
 DOC[[ get the entity's name ]]
-function methods.entity.get_name(self, cont)
-  return self._name
+function methods.entity.get__name(self, cont)
+  return self._name_
 end
 
 DOC[[ set the entity's name ]]
-function methods.entity.set_name(self, cont, name)
-  local old_name = self:get_name()
+function methods.entity.set__name(self, cont, name)
+  -- disocciate old name, associate new one
+  local old_name = self._name_
   if old_name ~= nil and old_name ~= name then entities[old_name] = nil end
-
-  self._name = name
+  self._name_ = name
   if name ~= nil then entities[name] = self end
 end
 
@@ -501,7 +531,7 @@ end
 
 DOC[[ called on string conversion with tostring(self) ]]
 function methods.entity.to_string(self, cont)
-  return '<ent:' .. (self:get_name() or self._id) .. '>'
+  return '<ent:' .. (self._name or self._id) .. '>'
 end
 
 
