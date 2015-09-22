@@ -491,8 +491,12 @@ function methods.entity.rsubs(self, cont)
 end
 
 
-DOC[[ immediately forget an entity and disconnect its sub/proto links, remember
-      to call cont() (generally at end) while overriding! ]]
+DOC[[ immediately forget an entity and disconnect its sub/proto links
+
+      the `entity` implementation of this method does some basic things, like
+      dissociating the entity from name lookup and disconnecting from
+      protos/subs, so make sure to call cont() (generally at the end) when
+      overriding! ]]
 function methods.entity.destroy(self, cont)
   -- remove from subs' list of _proto_ids
   for sub_id in pairs(rawget(self, '_sub_ids')) do
