@@ -27,11 +27,10 @@ ideas
     - in-game output console
     - sprite
 
+    - set slots in order of appearance in protos
     - automatically maintain 'methods.x' as a proto for 'entities.x' (?)
     - docs for 'entity'
     - fix 'slot deletion' to remove metadata too
-    - ensure that code in 'lib.entity' actually doesn't assume 'entity' as an
-        rproto
     - switch to 'get_slot_meta()' and 'set_slot_meta()'
 
 + potential:
