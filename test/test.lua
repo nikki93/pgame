@@ -31,7 +31,7 @@ end
 test_traits:add {
   _name = 'player',
   _protos = { methods.player, 'drawable', 'update', 'input', 'transform' },
-  
+
   dir = 1,
   position = vec2(10, 200),
 }
